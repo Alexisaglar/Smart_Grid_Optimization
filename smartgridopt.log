@@ -806,3 +806,55 @@ Traceback (most recent call last):
     return network_structure
            ^^^^^^^^^^^^^^^^^
 NameError: name 'network_structure' is not defined
+2025-04-23 15:23:31 [ERROR] Error while creating network structure: 
+name 'horizon' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 150, in main
+    network_results(net, horizon, loads, EV_BUS)
+                         ^^^^^^^
+NameError: name 'horizon' is not defined
+2025-04-23 15:23:38 [ERROR] Error while creating network structure: 
+name 't' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 150, in main
+    network_results(net, 24, loads, EV_BUS)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 125, in network_results
+    pv = pv_peak + 30 * np.sin(( np.pi/24 )*(t-6))**2
+                                             ^
+NameError: name 't' is not defined
+2025-04-23 15:23:49 [ERROR] Error while creating network structure: 
+object of type 'int' has no len()
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 150, in main
+    network_results(net, 24, loads, EV_BUS)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 141, in network_results
+    for i in range(len(horizon)):
+                   ^^^^^^^^^^^^
+TypeError: object of type 'int' has no len()
+2025-04-23 15:25:03 [ERROR] Error while creating network structure: 
+object of type 'int' has no len()
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 151, in main
+    network_results(net, 24, loads, EV_BUS)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 142, in network_results
+    for i in range(len(horizon)):
+                   ^^^^^^^^^^^^
+TypeError: object of type 'int' has no len()
+2025-04-23 15:26:10 [ERROR] Error while creating network structure: 
+object of type 'int' has no len()
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 151, in main
+    network_results(net, 24, loads, EV_BUS)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 142, in network_results
+    for i in range(len(horizon)):
+                   ^^^^^^^^^^^^
+TypeError: object of type 'int' has no len()
+2025-04-23 15:26:19 [ERROR] Error while creating network structure: 
+object of type 'int' has no len()
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 151, in main
+    network_results(net, 24, loads, EV_BUS)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 142, in network_results
+    for i in range(len(horizon)):
+                   ^^^^^^^^^^^^
+TypeError: object of type 'int' has no len()

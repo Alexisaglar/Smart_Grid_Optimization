@@ -94,7 +94,10 @@ def generate_loads(
             factor_map.get(cls, np.zeros(n_hours))
             for cls in bus_class
         ])
+
+        # added 0's as p_mw and q_mvar don't return values for slack bus
         p_base, q_base = np.array(0), np.array(0)
+
         p_base = np.append(p_base, net.load.p_mw.to_numpy()).reshape(n_buses, 1)
         q_base = np.append(q_base, net.load.q_mvar.to_numpy()).reshape(n_buses, 1)
 
@@ -110,15 +113,44 @@ def generate_loads(
 
     return loads 
 
+def network_results(
+    net: pp.pandapowerNet,
+    horizon: int,
+    loads: ndarray,
+    ev_bus: list,
+) -> None:
 
+    # PV really easy example
+    pv_peak = 60
+    pv = pv_peak + 30 * np.sin(( np.pi/24 )*(horizon-6))**2
+    pv += np.random.normal(0, 1, size=24) # some noise
+    pv = np.clip(pv, 0, None)
 
+    # EV very simple example
+    ev = np.zeros(24)
+    start, duration, rate = 18, 4, 7.4
+    ev[start:start+duration] = (rate/1000)
+
+    # BESS 
+    bess_capacity = 100 # kWh
+    bess_power_max = 30
+    soc = np.zeros(25)
+    bess = np.zeros(24)
+    print(loads[ev_bus, 0, :])
+    print(loads[ev_bus, 0, :] - ev)
+
+    for i in range(len(horizon)):
+        power_bus_t = loads[:, 0, :] + pv 
+        
+        pp.runpf(net)
 
 def main():
     args = parse_args()
     try:
         net = pn.case33bw()
         loads = generate_loads(net, BUS_CLASS)
-        network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, loads)
+        network_results(net, 24, loads, EV_BUS)
+        # network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, loads)
     except Exception as e:
         logger.exception(f'Error while creating network structure: \n{e}')
 
