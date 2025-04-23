@@ -1,0 +1,808 @@
+2025-04-23 12:33:01 [ERROR] Error while running main loop: 
+'pandapowerNet' instance has no attribute 'type'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 30, in <module>
+    main()
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 25, in main
+    network_building(pn.case33bw())
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 21, in network_building
+    print(network.type)
+          ^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 235, in __getattr__
+    raise AttributeError(
+AttributeError: 'pandapowerNet' instance has no attribute 'type'
+2025-04-23 12:34:14 [ERROR] Error while running main loop: 
+type object 'pandapowerNet' has no attribute 'load'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 30, in <module>
+    main()
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 25, in main
+    network_building(pn.case33bw())
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 21, in network_building
+    print(pp.pandapowerNet.load)
+          ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'pandapowerNet' has no attribute 'load'
+2025-04-23 12:34:42 [ERROR] Error while running main loop: 
+'pandapowerNet' instance has no attribute 'loads'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 30, in <module>
+    main()
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 25, in main
+    network_building(pn.case33bw())
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 21, in network_building
+    print(network.loads)
+          ^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 235, in __getattr__
+    raise AttributeError(
+AttributeError: 'pandapowerNet' instance has no attribute 'loads'. Did you mean: 'load'?
+2025-04-23 12:35:02 [ERROR] Error while running main loop: 
+'Series' object is not callable
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 30, in <module>
+    main()
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 25, in main
+    network_building(pn.case33bw())
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 21, in network_building
+    print(network.load.type())
+          ^^^^^^^^^^^^^^^^^^^
+TypeError: 'Series' object is not callable
+2025-04-23 13:10:20 [ERROR] Error while creating network structure: 
+'Namespace' object has no attribute 'ev_buses'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 52, in main
+    network_structure = attach_distributed_sources(net, args.ev_buses, args.pv_buses, args.bess_buses)
+                                                        ^^^^^^^^^^^^^
+AttributeError: 'Namespace' object has no attribute 'ev_buses'
+2025-04-23 13:11:11 [ERROR] Error while creating network structure: 
+attach_distributed_sources() takes 0 positional arguments but 4 were given
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 51, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus_list, args.pv_bus_list, args.bess_bus_list)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: attach_distributed_sources() takes 0 positional arguments but 4 were given
+2025-04-23 13:20:47 [ERROR] Error while creating network structure: 
+name 'BUS_CLASS' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 68, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 51, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+                                   ^^^^^^^^^
+NameError: name 'BUS_CLASS' is not defined
+2025-04-23 13:31:18 [ERROR] Error while creating network structure: 
+name 'BUS_CLASS' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 86, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 69, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+                                   ^^^^^^^^^
+NameError: name 'BUS_CLASS' is not defined. Did you mean: 'BUSS_CLASS'?
+2025-04-23 13:31:29 [ERROR] Error while creating network structure: 
+name 'BUS_CLASS' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 86, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 69, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+                                   ^^^^^^^^^
+NameError: name 'BUS_CLASS' is not defined. Did you mean: 'BUSS_CLASS'?
+2025-04-23 13:32:02 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 86, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:32:55 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:33:02 [ERROR] Error while creating network structure: 
+'Series' object has no attribute 'type'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 69, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(p_mw_bus.type)
+          ^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 6296, in __getattr__
+    return object.__getattribute__(self, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Series' object has no attribute 'type'. Did you mean: 'dtype'?
+2025-04-23 13:33:05 [ERROR] Error while creating network structure: 
+'Series' object has no attribute 'type'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 69, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(p_mw_bus.type())
+          ^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 6296, in __getattr__
+    return object.__getattribute__(self, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Series' object has no attribute 'type'. Did you mean: 'dtype'?
+2025-04-23 13:33:10 [ERROR] Error while creating network structure: 
+'numpy.dtypes.Float64DType' object is not callable
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 69, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(p_mw_bus.dtype())
+          ^^^^^^^^^^^^^^^^
+TypeError: 'numpy.dtypes.Float64DType' object is not callable
+2025-04-23 13:33:17 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:33:31 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:34:04 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 85, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:34:09 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 86, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:34:23 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 86, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:34:34 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 86, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:36:31 [ERROR] Error while creating network structure: 
+'int' object is not iterable
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 69, in attach_distributed_sources
+    df_loads = generate_loads(net, BUS_CLASS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 77, in generate_loads
+    for i in len(bus_class):
+TypeError: 'int' object is not iterable
+2025-04-23 13:37:17 [ERROR] Error while creating network structure: 
+attach_distributed_sources() missing 1 required positional argument: 'bus_class'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: attach_distributed_sources() missing 1 required positional argument: 'bus_class'
+2025-04-23 13:37:28 [ERROR] Error while creating network structure: 
+'int' object is not iterable
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 78, in generate_loads
+    for i in len(bus_class):
+TypeError: 'int' object is not iterable
+2025-04-23 13:37:41 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 72, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:38:08 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 87, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 72, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:41:54 [ERROR] Error while creating network structure: 
+'pandapowerNet' instance has no attribute 'iloc'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 100, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(net.iloc[i].load)
+          ^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 235, in __getattr__
+    raise AttributeError(
+AttributeError: 'pandapowerNet' instance has no attribute 'iloc'
+2025-04-23 13:42:04 [ERROR] Error while creating network structure: 
+'pandapowerNet' instance has no attribute 'loc'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 100, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(net.loc[i].load)
+          ^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 235, in __getattr__
+    raise AttributeError(
+AttributeError: 'pandapowerNet' instance has no attribute 'loc'
+2025-04-23 13:42:12 [ERROR] Error while creating network structure: 
+32
+Traceback (most recent call last):
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2606, in pandas._libs.hashtable.Int64HashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2630, in pandas._libs.hashtable.Int64HashTable.get_item
+KeyError: 32
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 100, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(net.load.loc[i])
+          ~~~~~~~~~~~~^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1191, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1431, in _getitem_axis
+    return self._get_label(key, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1381, in _get_label
+    return self.obj.xs(label, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 4298, in xs
+    loc = index.get_loc(key)
+          ^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 32
+2025-04-23 13:42:32 [ERROR] Error while creating network structure: 
+32
+Traceback (most recent call last):
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2606, in pandas._libs.hashtable.Int64HashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2630, in pandas._libs.hashtable.Int64HashTable.get_item
+KeyError: 32
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 100, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 79, in generate_loads
+    print(net.load.p_mw.loc[i])
+          ~~~~~~~~~~~~~~~~~^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1191, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1431, in _getitem_axis
+    return self._get_label(key, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1381, in _get_label
+    return self.obj.xs(label, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 4298, in xs
+    loc = index.get_loc(key)
+          ^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 32
+2025-04-23 13:43:05 [ERROR] Error while creating network structure: 
+name 'df_loads' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 102, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 93, in generate_loads
+    return df_loads
+          ^^^^^^^^
+NameError: name 'df_loads' is not defined
+2025-04-23 13:43:21 [ERROR] Error while creating network structure: 
+name 'df_loads' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 101, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 92, in generate_loads
+    return df_loads
+          ^^^^^^^^
+NameError: name 'df_loads' is not defined
+2025-04-23 13:43:31 [ERROR] Error while creating network structure: 
+name 'df_loads' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 101, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 92, in generate_loads
+    return df_loads
+          ^^^^^^^^
+NameError: name 'df_loads' is not defined
+2025-04-23 13:43:46 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 102, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 72, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:47:08 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 72, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 13:48:35 [ERROR] Error while creating network structure: 
+can't multiply sequence by non-int of type 'numpy.float64'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 81, in generate_loads
+    p_mw = pd.Series(RESIDENTIAL_LOAD_FACTOR * net.load.p_mw.loc[i])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+TypeError: can't multiply sequence by non-int of type 'numpy.float64'
+2025-04-23 13:49:08 [ERROR] Error while creating network structure: 
+name 'np' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 102, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 70, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 80, in generate_loads
+    p_mw = pd.Series(np.array(RESIDENTIAL_LOAD_FACTOR) * net.load.p_mw.loc[i])
+                     ^^
+NameError: name 'np' is not defined
+2025-04-23 13:49:17 [ERROR] Error while creating network structure: 
+can't multiply sequence by non-int of type 'numpy.float64'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 82, in generate_loads
+    q_mw = pd.Series(RESIDENTIAL_LOAD_FACTOR * net.load.p_mw.loc[i])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+TypeError: can't multiply sequence by non-int of type 'numpy.float64'
+2025-04-23 13:49:32 [ERROR] Error while creating network structure: 
+can't multiply sequence by non-int of type 'numpy.float64'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 83, in generate_loads
+    print(RESIDENTIAL_LOAD_FACTOR * net.load.p_mw.loc[i])
+          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+TypeError: can't multiply sequence by non-int of type 'numpy.float64'
+2025-04-23 13:49:43 [ERROR] Error while creating network structure: 
+32
+Traceback (most recent call last):
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2606, in pandas._libs.hashtable.Int64HashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 2630, in pandas._libs.hashtable.Int64HashTable.get_item
+KeyError: 32
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 81, in generate_loads
+    p_mw = pd.Series(np.array(RESIDENTIAL_LOAD_FACTOR) * net.load.p_mw.loc[i])
+                                                         ~~~~~~~~~~~~~~~~~^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1191, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1431, in _getitem_axis
+    return self._get_label(key, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexing.py", line 1381, in _get_label
+    return self.obj.xs(label, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 4298, in xs
+    loc = index.get_loc(key)
+          ^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 32
+2025-04-23 13:50:28 [ERROR] Error while creating network structure: 
+can't multiply sequence by non-int of type 'numpy.float64'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 81, in generate_loads
+    p_mw = pd.Series(RESIDENTIAL_LOAD_FACTOR * net.load.p_mw.loc[i].astype(float))
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can't multiply sequence by non-int of type 'numpy.float64'
+2025-04-23 13:50:44 [ERROR] Error while creating network structure: 
+can't multiply sequence by non-int of type 'numpy.float64'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 81, in generate_loads
+    p_mw = pd.Series(RESIDENTIAL_LOAD_FACTOR * (net.load.p_mw.loc[i]).astype(float))
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can't multiply sequence by non-int of type 'numpy.float64'
+2025-04-23 13:51:02 [ERROR] Error while creating network structure: 
+can't multiply sequence by non-int of type 'float'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    df_loads = generate_loads(net, bus_class)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 81, in generate_loads
+    p_mw = pd.Series(RESIDENTIAL_LOAD_FACTOR * float(net.load.p_mw.loc[i]))
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can't multiply sequence by non-int of type 'float'
+2025-04-23 14:00:36 [ERROR] Error while creating network structure: 
+name 'df_loads' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 103, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 94, in generate_loads
+    return df_loads
+          ^^^^^^^^
+NameError: name 'df_loads' is not defined
+2025-04-23 14:02:45 [ERROR] Error while creating network structure: 
+'tuple' object is not callable
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 109, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 92, in generate_loads
+    p_base = net.load.p_mw.to_numpy().shape(n_buses, 1)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'tuple' object is not callable
+2025-04-23 14:07:22 [ERROR] Error while creating network structure: 
+cannot reshape array of size 32 into shape (33,1)
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 109, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 92, in generate_loads
+    p_base = net.load.p_mw.to_numpy().reshape(n_buses, 1)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: cannot reshape array of size 32 into shape (33,1)
+2025-04-23 14:07:44 [ERROR] Error while creating network structure: 
+cannot reshape array of size 32 into shape (34,1)
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 109, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 92, in generate_loads
+    p_base = net.load.p_mw.to_numpy().reshape(n_buses+1, 1)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: cannot reshape array of size 32 into shape (34,1)
+2025-04-23 14:08:11 [ERROR] Error while creating network structure: 
+name 'df_loads' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 109, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 100, in generate_loads
+    return df_loads
+          ^^^^^^^^
+NameError: name 'df_loads' is not defined
+2025-04-23 14:10:54 [ERROR] Error while creating network structure: 
+operands could not be broadcast together with shapes (32,1) (33,24) 
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 113, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 96, in generate_loads
+    p_time = p_base * factors
+             ~~~~~~~^~~~~~~~~
+ValueError: operands could not be broadcast together with shapes (32,1) (33,24) 
+2025-04-23 14:10:58 [ERROR] Error while creating network structure: 
+operands could not be broadcast together with shapes (32,1) (33,24) 
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 113, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 96, in generate_loads
+    p_time = p_base * factors
+             ~~~~~~~^~~~~~~~~
+ValueError: operands could not be broadcast together with shapes (32,1) (33,24) 
+2025-04-23 14:11:08 [ERROR] Error while creating network structure: 
+operands could not be broadcast together with shapes (32,1) (33,24) 
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 112, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 96, in generate_loads
+    p_time = p_base * factors
+             ~~~~~~~^~~~~~~~~
+ValueError: operands could not be broadcast together with shapes (32,1) (33,24) 
+2025-04-23 14:14:26 [ERROR] Error while creating network structure: 
+'numpy.ndarray' object has no attribute 'append'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 116, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 95, in generate_loads
+    p_base = p_base.append(net.load.p_mw.to_numpy().reshape(n_buses, 1))
+             ^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'append'
+2025-04-23 14:14:46 [ERROR] Error while creating network structure: 
+cannot reshape array of size 32 into shape (33,1)
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 116, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 95, in generate_loads
+    p_base = np.append(p_base, net.load.p_mw.to_numpy().reshape(n_buses, 1))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: cannot reshape array of size 32 into shape (33,1)
+2025-04-23 14:15:22 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 116, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 73, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:15:34 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 117, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 73, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:15:59 [ERROR] Error while creating network structure: 
+'numpy.ndarray' object has no attribute 'head'
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 117, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 71, in attach_distributed_sources
+    loads = generate_loads(net, bus_class)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 104, in generate_loads
+    print(df_loads.head())
+          ^^^^^^^^^^^^^
+AttributeError: 'numpy.ndarray' object has no attribute 'head'
+2025-04-23 14:16:27 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 117, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 73, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:16:41 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 114, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 73, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:16:46 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 114, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 73, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:18:02 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 113, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 73, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:24:44 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 119, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 74, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:24:57 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 119, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 74, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:25:14 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 119, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 74, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
+2025-04-23 14:25:20 [ERROR] Error while creating network structure: 
+name 'network_structure' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 119, in main
+    network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, BUS_CLASS)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 74, in attach_distributed_sources
+    return network_structure
+           ^^^^^^^^^^^^^^^^^
+NameError: name 'network_structure' is not defined
