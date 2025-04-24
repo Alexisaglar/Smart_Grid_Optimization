@@ -1,0 +1,21 @@
+2025-04-24 17:42:46 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:47:32 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:49:21 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:51:58 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:54:02 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:56:03 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:56:52 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 17:57:38 [ERROR] Error while creating network structure: 
+setting an array element with a sequence.
+TypeError: only length-1 arrays can be converted to Python scalars
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/alexisaglar/Smart_Grid_Optimization/src/network_building.py", line 205, in main
+    network_results(net, 24, loads, args.ev_bus, args.pv_bus)
+  File "/Users/alexisaglar/Smart_Grid_Optimization/src/network_building.py", line 186, in network_results
+    state_of_charge[bus, t] = state_of_charge[bus, t-1] + (power_battery / battery_total_capacity)
+ValueError: setting an array element with a sequence.
+2025-04-24 18:18:56 [DEBUG] Loaded backend macosx version unknown.
+2025-04-24 18:20:34 [DEBUG] Loaded backend macosx version unknown.
