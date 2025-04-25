@@ -136,8 +136,8 @@ def network_results(
     power_battery_discharge_max = 0.03
     power_battery_charge_max = 0.03
     battery_total_capacity = 0.5
-    battery_discharge_eff = 0.9
-    battery_charge_eff = 0.9
+    battery_discharge_eff = 0.95
+    battery_charge_eff = 0.95
     state_of_charge = np.zeros((network, horizon))
     surplus_power = np.zeros((network, horizon))
     delta_t = 60
@@ -146,9 +146,10 @@ def network_results(
         # Determine the resource state of each bus:
         for bus in range(network):
             # calculate bss state and total demand
+            
             if bus in pv_bus:
-                power_battery_available[bus, t] = (state_of_charge[bus, t-1] * battery_total_capacity) / (delta_t * battery_discharge_eff)
-                power_battery_required[bus, t] = ((state_of_charge[bus, t-1] - 100) * battery_total_capacity) * battery_charge_eff / delta_t
+                power_battery_available[bus, t] = (state_of_charge[bus, t-1] * battery_total_capacity) * (battery_discharge_eff)
+                power_battery_required[bus, t] = ((1 - state_of_charge[bus, t-1]) * battery_total_capacity) / battery_charge_eff 
 
                 # Discharging state
                 if pv_power[t] < loads[bus, 0, t]:
@@ -158,12 +159,12 @@ def network_results(
                         -power_battery_discharge_max
                     )
                     if power_battery_available[bus, t] > abs(power_battery[bus, t]):
-                        state_of_charge[bus, t] = state_of_charge[bus, t-1] + (power_battery[bus, t] / battery_total_capacity)
-                        loads[bus, 0, t] = power_battery[bus, t] - power_battery_available[bus, t] 
+                        state_of_charge[bus, t] = state_of_charge[bus, t-1] + (abs(power_battery[bus, t]) / battery_total_capacity)
+                        loads[bus, 0, t] = -pv_power[t] + power_battery[bus, t]
 
                     else:
                         state_of_charge[bus, t] = 0
-                        loads[bus, 0, t] = abs(power_battery[bus, t]) - power_battery_available[bus, t] 
+                        loads[bus, 0, t] = abs(power_battery[bus, t]) - pv_power[t]
 
                     print('*' * 50 + f' Bus: {bus}  Time: {t} ' + '*' * 50)
                     print(f'Power coming from PV is not enough to provide for power demand.\n')
@@ -197,16 +198,22 @@ def network_results(
                     print(f'State of Charge: {state_of_charge[bus, t]}\n')
                     print(f'Power battery: {power_battery[bus, t]}\n')
 
+            # power_bus = load[bus, 0, t]
+            # power_bus = loads[] - pv_power + power_battery 
+            power_required[bus, t] = 
             if bus in ev_bus:
                 pass
-
+    
+    
     plt.plot(loads[9, 0, :], label='power demand')
     plt.plot(power_battery[9, :], label='power battery')
     # plt.plot(state_of_charge[9, :], label='SoC')
     plt.plot(pv_power, label='PV')
     plt.legend()
     plt.show()
-
+    
+    plt.plot(loads[9, 0, :])
+    plt.show()
             # pp.runpf(net)
 
 def main():
