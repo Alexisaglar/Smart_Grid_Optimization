@@ -1,4 +1,5 @@
 import sys
+from typing import Tuple
 from numpy._core.multiarray import ndarray
 import pandas as pd
 import pandapower as pp
@@ -9,6 +10,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
+
+
+
+# battery configuration settings
+BATTERY_DISCHARGE_EFF, BATTERY_CHARGE_EFF = 0.95, 0.95
+POWER_BATTERY_DISCHARGE_MAX, POWER_BATTERY_CHARGE_MAX = 0.03, 0.03
+DELTA_T = 60
+BATTERY_TOTAL_CAPACITY = 0.5
+network = 33
+horizon = 24
+state = ''
+power_battery = np.zeros((network, horizon))
+power_battery_available = np.zeros((network, horizon))
+power_battery_required = np.zeros((network, horizon))
+power_bus = np.zeros((network, 2, horizon))
+state_of_charge = np.zeros((network, horizon))
+remain_power = np.zeros((network, horizon))
 
 # Default values
 EV_BUS = [2, 5, 32]
@@ -72,7 +90,6 @@ def attach_distributed_sources(
     loads: ndarray,
 ) -> pp.pandapowerNet:
        
-
     pass
     # return network_structure
 
@@ -118,7 +135,7 @@ def generate_loads(
 def network_results(
     net: pp.pandapowerNet,
     horizon: int,
-    loads: ndarray,
+    power_demand: ndarray,
     ev_bus: list,
     pv_bus: list,
 ) -> None:
@@ -126,95 +143,76 @@ def network_results(
         0, 0, 0, 0, 0, 0, 0.01, 0.02, 0.04, 0.06, 0.1, 0.15,
         0.12, 0.1, 0.05, 0.045, 0.03, 0.01, 0, 0, 0, 0, 0, 0
     ]
-
-    network = 33
-
-    # battery configuration settings
-    power_battery = np.zeros((network, horizon))
-    power_battery_available = np.zeros((network, horizon))
-    power_battery_required = np.zeros((network, horizon))
-    power_battery_discharge_max = 0.03
-    power_battery_charge_max = 0.03
-    battery_total_capacity = 0.5
-    battery_discharge_eff = 0.95
-    battery_charge_eff = 0.95
-    state_of_charge = np.zeros((network, horizon))
-    surplus_power = np.zeros((network, horizon))
-    delta_t = 60
-
     for t in range(horizon):
+        power_bus = power_demand
         # Determine the resource state of each bus:
-        for bus in range(network):
-            # calculate bss state and total demand
+        for bus in pv_bus:
+            power_battery_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
+            power_battery_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
+            print(f'Power_required: {power_battery_required[bus,t]}, power_available: {power_battery_available[bus,t]}, previous_soc: {state_of_charge[bus, t]}')
             
-            if bus in pv_bus:
-                power_battery_available[bus, t] = (state_of_charge[bus, t-1] * battery_total_capacity) * (battery_discharge_eff)
-                power_battery_required[bus, t] = ((1 - state_of_charge[bus, t-1]) * battery_total_capacity) / battery_charge_eff 
+            # Discharging state
+            if pv_power[t] <= power_demand[bus, 0, t]:
+                # This will always be a negative value as pv power generation is not enough
+                state = 'discharge'
+                power_battery[bus, t] = max(
+                    (pv_power[t] - power_demand[bus, 0, t]),
+                    -power_battery_available[bus, t],
+                    -POWER_BATTERY_DISCHARGE_MAX
+                )
+                print(f'State: {state}, power_battery: {power_battery[bus,t]}')
 
-                # Discharging state
-                if pv_power[t] < loads[bus, 0, t]:
-                    power_battery[bus, t] = max(
-                        (pv_power[t] - loads[bus, 0, t]),
-                        -power_battery_available[bus, t],
-                        -power_battery_discharge_max
-                    )
-                    if power_battery_available[bus, t] > abs(power_battery[bus, t]):
-                        state_of_charge[bus, t] = state_of_charge[bus, t-1] + (abs(power_battery[bus, t]) / battery_total_capacity)
-                        loads[bus, 0, t] = -pv_power[t] + power_battery[bus, t]
+            # Charge state
+            if pv_power[t] > power_demand[bus, 0, t]:
+                state = 'charge'
+                power_battery[bus, t] = min(
+                    (pv_power[t] - power_demand[bus, 0, t]),
+                    power_battery_required[bus, t],
+                    POWER_BATTERY_CHARGE_MAX, 
+                )
+                print(f'State: {state}, power_battery: {power_battery[bus,t]}')
 
-                    else:
-                        state_of_charge[bus, t] = 0
-                        loads[bus, 0, t] = abs(power_battery[bus, t]) - pv_power[t]
+            state_of_charge[bus, t] = update_battery_values(
+                state_of_charge[bus, t-1],
+                power_battery[bus, t],
+                state,
+            ) 
+            print(f'State: {state}, state_of_charge: {state_of_charge[bus,t]}')
+            
 
-                    print('*' * 50 + f' Bus: {bus}  Time: {t} ' + '*' * 50)
-                    print(f'Power coming from PV is not enough to provide for power demand.\n')
-                    print(f'PV_power: {pv_power[t]}\n')
-                    print(f'Power demand: {loads[bus, 0, t]}\n')
-                    print(f'State of Charge: {state_of_charge[bus, t]}\n')
-                    print(f'Power battery: {power_battery[bus, t]}\n')
-
-                # Charging state
-                if pv_power[t] > loads[bus, 0, t]:
-                    power_battery[bus, t] = min(
-                        (pv_power[t] - loads[bus, 0, t]),
-                        power_battery_required[bus, t],
-                        power_battery_charge_max, 
-                    )
-                    if power_battery_required[bus, t] < power_battery[bus, t]:
-                        state_of_charge[bus, t] = 100
-                        loads[bus, 0, t] = power_battery[bus, t] + power_battery_required
-
-                    else:
-                        loads[bus, 0, t] = 0
-                        state_of_charge[bus, t] = state_of_charge[bus, t-1] + (power_battery[bus, t] / battery_total_capacity)
-                    # if state_of_charge[bus, t] < 100:
-                    #     if power_battery[bus, t] > power_battery_required[bus, t]:
-                    #         state_of_charge[bus, t] = 100
-                    #     else:
-                    print('*' * 50 + f' Bus: {bus}  Time: {t} ' + '*' * 50)
-                    print(f'There is a surplus in energy generation.\n')
-                    print(f'PV_power: {pv_power[t]}\n')
-                    print(f'Power demand: {loads[bus, 0, t]}\n')
-                    print(f'State of Charge: {state_of_charge[bus, t]}\n')
-                    print(f'Power battery: {power_battery[bus, t]}\n')
-
-            # power_bus = load[bus, 0, t]
-            # power_bus = loads[] - pv_power + power_battery 
-            power_required[bus, t] = 
+            power_bus[bus, 0, t] = power_demand[bus, 0, t] - pv_power[t] + power_battery[bus, t]
+    
             if bus in ev_bus:
                 pass
     
     
-    plt.plot(loads[9, 0, :], label='power demand')
+    plt.plot(power_demand[9, 0, :], label='power demand')
     plt.plot(power_battery[9, :], label='power battery')
     # plt.plot(state_of_charge[9, :], label='SoC')
     plt.plot(pv_power, label='PV')
     plt.legend()
     plt.show()
+    plt.plot(power_demand[9, 0, :], label='load')
     
-    plt.plot(loads[9, 0, :])
-    plt.show()
+    
             # pp.runpf(net)
+def update_battery_values(
+    previous_soc: float,
+    power_battery: float,
+    state: str,
+    delta_t: float = DELTA_T,
+    charging_eff: float = BATTERY_CHARGE_EFF,
+    discharge_eff: float = BATTERY_DISCHARGE_EFF,
+    battery_capacity: float = BATTERY_TOTAL_CAPACITY,
+) -> float:
+    match state:
+        case 'charge':
+            state_of_charge = previous_soc + ((power_battery * delta_t / battery_capacity * discharge_eff)/100)
+            return state_of_charge
+
+        case 'discharge':
+            state_of_charge = previous_soc + ((power_battery * delta_t * charging_eff / battery_capacity)/100)
+            return state_of_charge
 
 def main():
     args = parse_args()
