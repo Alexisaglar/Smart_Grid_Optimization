@@ -7999,3 +7999,70 @@ ValueError: setting an array element with a sequence.
 2025-04-25 17:30:29 [DEBUG] findfont: score(FontEntry(fname='/Users/alexisaglar/Library/Fonts/VictorMonoNerdFont-LightOblique.ttf', name='VictorMono NF', style='oblique', variant='normal', weight=300, stretch='normal', size='scalable')) = 11.145
 2025-04-25 17:30:29 [DEBUG] findfont: score(FontEntry(fname='/Users/alexisaglar/Library/Fonts/NotoSansMNerdFont-Thin.ttf', name='NotoSansM NF', style='normal', variant='normal', weight=250, stretch='normal', size='scalable')) = 10.1925
 2025-04-25 17:30:29 [DEBUG] findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('/Users/alexisaglar/resource_allocation_live/tftenv/lib/python3.9/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000.
+2025-04-28 15:15:16 [ERROR] Error while creating network structure: 
+name 'bus' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 237, in main
+    network_results(net, 24, loads, args.ev_bus, args.pv_bus)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 143, in network_results
+    ev_data = arrival_departure_ev(ev_bus, True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 218, in arrival_departure_ev
+    print(bus)
+          ^^^
+NameError: name 'bus' is not defined
+2025-04-28 15:15:26 [ERROR] Error while creating network structure: 
+name 'bus' is not defined
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 237, in main
+    network_results(net, 24, loads, args.ev_bus, args.pv_bus)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 143, in network_results
+    ev_data = arrival_departure_ev(ev_bus, True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 218, in arrival_departure_ev
+    print(bus)
+          ^^^
+NameError: name 'bus' is not defined
+2025-04-28 15:16:01 [ERROR] Error while creating network structure: 
+Length of values (1) does not match length of index (3)
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 237, in main
+    network_results(net, 24, loads, args.ev_bus, args.pv_bus)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 143, in network_results
+    ev_data = arrival_departure_ev(ev_bus, True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 221, in arrival_departure_ev
+    ev_data['arrival'] = np.random.randint(len(ev_bus), [24])
+    ~~~~~~~^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/frame.py", line 4299, in __setitem__
+    self._set_item(key, value)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/frame.py", line 4512, in _set_item
+    value, refs = self._sanitize_column(value)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/frame.py", line 5253, in _sanitize_column
+    com.require_length_match(value, self.index)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/common.py", line 573, in require_length_match
+    raise ValueError(
+ValueError: Length of values (1) does not match length of index (3)
+2025-04-28 16:22:02 [ERROR] Error while creating network structure: 
+The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 243, in main
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 173, in network_results
+    # how do we determine that the EV is in the charging station?
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 1576, in __nonzero__
+    raise ValueError(
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2025-04-28 16:26:50 [ERROR] Error while creating network structure: 
+The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 252, in main
+    ev_data = generate_ev_data(args.ev_bus, random_profile=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 230, in generate_ev_data
+    ev_data['range_at_station'] = [np.arange(ev_data['arrival'].iloc[i], ev_data['departure'].iloc[i]) for i in range(len(ev_data))]
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 1576, in __nonzero__
+    raise ValueError(
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().

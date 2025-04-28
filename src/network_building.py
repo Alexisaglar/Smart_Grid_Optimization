@@ -10,9 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-
-
-
 # battery configuration settings
 BATTERY_DISCHARGE_EFF, BATTERY_CHARGE_EFF = 0.95, 0.95
 POWER_BATTERY_DISCHARGE_MAX, POWER_BATTERY_CHARGE_MAX = 0.03, 0.03
@@ -29,8 +26,8 @@ state_of_charge = np.zeros((network, horizon))
 remain_power = np.zeros((network, horizon))
 
 # Default values
-EV_BUS = [2, 5, 32]
-PV_BUS = [9, 8, 15]
+EV_BUS = [8, 15, 28]
+PV_BUS = [11, 17, 22, 24, 32]
 BESS_BUS = [9, 8, 15]
 BUS_CLASS = pd.Series([ # Load Type: 0 = slack, 1 = Residential, 2 = Commercial, 3 = Industrial
     0, 1,  1, 1, 2, 1, 3, 3, 3, 2,
@@ -71,7 +68,7 @@ def parse_args() -> argparse.Namespace():
 
 # Setup logger.
 logging.basicConfig(
-    level = logging.DEBUG,
+    level = logging.INFO,
     handlers=[
         logging.StreamHandler(),
         logging.FileHandler('smartgridopt.log')
@@ -81,17 +78,6 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 logger = logging.getLogger(__name__)
-
-def attach_distributed_sources(
-    net: pp.pandapowerNet,
-    ev_bus: list,
-    pv_bus: list,
-    bess_bus: list,
-    loads: ndarray,
-) -> pp.pandapowerNet:
-       
-    pass
-    # return network_structure
 
 def generate_loads(
         net: pp.pandapowerNet,
@@ -136,13 +122,16 @@ def network_results(
     net: pp.pandapowerNet,
     horizon: int,
     power_demand: ndarray,
-    ev_bus: list,
+    # ev_bus: list,
+    ev_data: pd.DataFrame,
     pv_bus: list,
 ) -> None:
     pv_power = [ 
         0, 0, 0, 0, 0, 0, 0.01, 0.02, 0.04, 0.06, 0.1, 0.15,
         0.12, 0.1, 0.05, 0.045, 0.03, 0.01, 0, 0, 0, 0, 0, 0
     ]
+
+
     for t in range(horizon):
         power_bus = power_demand
         # Determine the resource state of each bus:
@@ -150,7 +139,7 @@ def network_results(
             power_battery_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
             power_battery_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
             print(f'Power_required: {power_battery_required[bus,t]}, power_available: {power_battery_available[bus,t]}, previous_soc: {state_of_charge[bus, t]}')
-            
+
             # Discharging state
             if pv_power[t] <= power_demand[bus, 0, t]:
                 # This will always be a negative value as pv power generation is not enough
@@ -177,25 +166,45 @@ def network_results(
                 power_battery[bus, t],
                 state,
             ) 
-            print(f'State: {state}, state_of_charge: {state_of_charge[bus,t]}')
-            
 
             power_bus[bus, 0, t] = power_demand[bus, 0, t] - pv_power[t] + power_battery[bus, t]
-    
-            if bus in ev_bus:
-                pass
-    
-    
-    plt.plot(power_demand[9, 0, :], label='power demand')
-    plt.plot(power_battery[9, :], label='power battery')
-    # plt.plot(state_of_charge[9, :], label='SoC')
-    plt.plot(pv_power, label='PV')
-    plt.legend()
-    plt.show()
-    plt.plot(power_demand[9, 0, :], label='load')
-    
-    
-            # pp.runpf(net)
+
+        for ev in ev_data.index:
+            # how do we determine that the EV is in the charging station?
+            # we create the available range by arrival and departure values
+            ev_power = np.zeros((24, 33))
+            if t <= ev_data.departure.iloc[ev] or t >= ev_data.arrival.iloc[ev]:
+                print(f'time: {t}')
+                # time.sleep(1)
+                # power_ev_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
+                # power_ev_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
+
+            #
+            #
+            # if ev in station:
+            #     pass
+            #
+            # if horizon in np.arange(ev_data.iloc[bus].arrival, ev_data.departure).any(): 
+            #     power_ev_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
+            #     power_ev_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
+            #     if ev_data.soc_at_arrival != 100:
+            #         state = 'charge'
+            #         power_ev = update_battery_values(ev_data.soc_at_arrival, ev_data.battery_capacity,)
+            #
+            #     if V2G_enables == True :
+            #         state = 'discharge'
+            # pass
+            #
+
+
+
+
+        net.load.p_mw = power_demand[1:, 0, t]
+        pp.runpp(net)
+
+        print('*' * 50 + f' Power flow results at time: {t} ' +'*' * 50)
+        print(f'p_mw: {net.res_load.p_mw.T}, voltage_pu: {net.res_bus.vm_pu.T}')
+
 def update_battery_values(
     previous_soc: float,
     power_battery: float,
@@ -214,13 +223,41 @@ def update_battery_values(
             state_of_charge = previous_soc + ((power_battery * delta_t * charging_eff / battery_capacity)/100)
             return state_of_charge
 
+def generate_ev_data(
+    ev_bus: list,
+    random_profile: bool,
+)-> pd.DataFrame:
+    ev_data = pd.DataFrame()
+    ev_data['bus_idx'] = ev_bus
+
+    if random_profile:
+        ev_data['arrival'] = np.random.randint(low=16, high=20, size=len(ev_bus))
+        ev_data['departure'] = np.random.randint(low=6, high=10, size=len(ev_bus))
+        # ev_data['range_at_station'] = [np.arange(ev_data['arrival'].iloc[i], ev_data['departure'].iloc[i]) for i in range(len(ev_data))]
+        ev_data['battery_capacity'] = np.random.randint(low=50, high=70, size=len(ev_bus))
+        ev_data['soc_at_arrival'] = np.random.randint(low=0, high=50, size=len(ev_bus))
+
+    # For testing purposes generate a stable constant arrival/departure/soc
+    else:
+        ev_data['arrival'] = np.full(shape=len(ev_bus), fill_value=17)
+        ev_data['departure'] = np.full(shape=len(ev_bus), fill_value=8)
+        # ev_data['range_at_station'] = [np.arange(ev_data['arrival'].iloc[i], ev_data['departure'].iloc[i], 1) for i in range(len(ev_data))]
+        ev_data['battery_capacity'] = np.full(shape=len(ev_bus), fill_value=17)
+        ev_data['soc_at_arrival'] = np.full(shape=len(ev_bus), fill_value=50)
+        pass
+
+    return ev_data
+
+
+
 def main():
-    args = parse_args()
     try:
+        args = parse_args()
         net = pn.case33bw()
         loads = generate_loads(net, BUS_CLASS)
-        network_results(net, 24, loads, args.ev_bus, args.pv_bus)
-        # network_structure = attach_distributed_sources(net, args.ev_bus, args.pv_bus, args.bess_bus, loads)
+        ev_data = generate_ev_data(args.ev_bus, random_profile=True)
+        network_results(net, horizon, loads, ev_data, args.pv_bus)
+
     except Exception as e:
         logger.exception(f'Error while creating network structure: \n{e}')
 
