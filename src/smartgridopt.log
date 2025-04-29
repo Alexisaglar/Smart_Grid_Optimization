@@ -8066,3 +8066,112 @@ Traceback (most recent call last):
   File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandas/core/generic.py", line 1576, in __nonzero__
     raise ValueError(
 ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2025-04-29 12:49:11 [ERROR] Error while creating network structure: 
+<code object _select_is_elements_numba at 0xd56e830, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x79f45af1d230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+Traceback (most recent call last):
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 592, in _pydevd_sys_monitoring_cython._get_func_code_info
+KeyError: (756, '/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py', <code object _python_set_elements_oos at 0x79f45af1d230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 260, in main
+    ev_data = generate_ev_data(args.ev_bus, random_profile=True)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 202, in network_results
+    pp.runpp(net)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/run.py", line 250, in runpp
+    _powerflow(net, **kwargs)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/powerflow.py", line 75, in _powerflow
+    ppc, ppci = _pd2ppc(net)
+                ^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/pd2ppc.py", line 101, in _pd2ppc
+    net["_is_elements"] = aux._select_is_elements_numba(net, sequence=sequence)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 798, in _select_is_elements_numba
+    set_elements_oos(element_df["bus"].values, element_df["in_service"].values,
+  File "<stringsource>", line 69, in cfunc.to_py.__Pyx_CFunc_893235__29_pydevd_sys_monitoring_cython_object__lParen__etc_to_py_4code_18instruction_offset.wrap
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 1702, in _pydevd_sys_monitoring_cython._start_method_event
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 599, in _pydevd_sys_monitoring_cython._get_func_code_info
+AssertionError: <code object _select_is_elements_numba at 0xd56e830, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x79f45af1d230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+2025-04-29 12:50:30 [ERROR] Error while creating network structure: 
+<code object _select_is_elements_numba at 0x379fd690, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x7dcefab1d230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+Traceback (most recent call last):
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 592, in _pydevd_sys_monitoring_cython._get_func_code_info
+KeyError: (756, '/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py', <code object _python_set_elements_oos at 0x7dcefab1d230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 261, in main
+    network_results(net, horizon, loads, ev_data, args.pv_bus)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 202, in network_results
+    pp.runpp(net)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/run.py", line 250, in runpp
+    _powerflow(net, **kwargs)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/powerflow.py", line 75, in _powerflow
+    ppc, ppci = _pd2ppc(net)
+                ^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/pd2ppc.py", line 101, in _pd2ppc
+    net["_is_elements"] = aux._select_is_elements_numba(net, sequence=sequence)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 798, in _select_is_elements_numba
+    set_elements_oos(element_df["bus"].values, element_df["in_service"].values,
+  File "<stringsource>", line 69, in cfunc.to_py.__Pyx_CFunc_893235__29_pydevd_sys_monitoring_cython_object__lParen__etc_to_py_4code_18instruction_offset.wrap
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 1702, in _pydevd_sys_monitoring_cython._start_method_event
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 599, in _pydevd_sys_monitoring_cython._get_func_code_info
+AssertionError: <code object _select_is_elements_numba at 0x379fd690, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x7dcefab1d230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+2025-04-29 12:51:00 [ERROR] Error while creating network structure: 
+<code object _select_is_elements_numba at 0x7e54440, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x77df1ab19230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+Traceback (most recent call last):
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 592, in _pydevd_sys_monitoring_cython._get_func_code_info
+KeyError: (756, '/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py', <code object _python_set_elements_oos at 0x77df1ab19230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 261, in main
+    network_results(net, horizon, loads, ev_data, args.pv_bus)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 202, in network_results
+    pp.runpp(net)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/run.py", line 250, in runpp
+    _powerflow(net, **kwargs)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/powerflow.py", line 75, in _powerflow
+    ppc, ppci = _pd2ppc(net)
+                ^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/pd2ppc.py", line 101, in _pd2ppc
+    net["_is_elements"] = aux._select_is_elements_numba(net, sequence=sequence)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 798, in _select_is_elements_numba
+    set_elements_oos(element_df["bus"].values, element_df["in_service"].values,
+  File "<stringsource>", line 69, in cfunc.to_py.__Pyx_CFunc_893235__29_pydevd_sys_monitoring_cython_object__lParen__etc_to_py_4code_18instruction_offset.wrap
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 1702, in _pydevd_sys_monitoring_cython._start_method_event
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 599, in _pydevd_sys_monitoring_cython._get_func_code_info
+AssertionError: <code object _select_is_elements_numba at 0x7e54440, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x77df1ab19230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+2025-04-29 14:07:39 [ERROR] Error while creating network structure: 
+<code object _select_is_elements_numba at 0x27ae0640, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x7d1d25b25230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>
+Traceback (most recent call last):
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 592, in _pydevd_sys_monitoring_cython._get_func_code_info
+KeyError: (756, '/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py', <code object _python_set_elements_oos at 0x7d1d25b25230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 264, in main
+    network_results(net, horizon, loads, ev_data, args.pv_bus)
+  File "/home/smartgrid/Smart_Grid_Optimization/src/network_building.py", line 205, in network_results
+    pp.runpp(net)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/run.py", line 250, in runpp
+    _powerflow(net, **kwargs)
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/powerflow.py", line 75, in _powerflow
+    ppc, ppci = _pd2ppc(net)
+                ^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/pd2ppc.py", line 101, in _pd2ppc
+    net["_is_elements"] = aux._select_is_elements_numba(net, sequence=sequence)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 798, in _select_is_elements_numba
+    set_elements_oos(element_df["bus"].values, element_df["in_service"].values,
+  File "<stringsource>", line 69, in cfunc.to_py.__Pyx_CFunc_893235__29_pydevd_sys_monitoring_cython_object__lParen__etc_to_py_4code_18instruction_offset.wrap
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 1702, in _pydevd_sys_monitoring_cython._start_method_event
+  File "_pydevd_sys_monitoring\\_pydevd_sys_monitoring_cython.pyx", line 599, in _pydevd_sys_monitoring_cython._get_func_code_info
+AssertionError: <code object _select_is_elements_numba at 0x27ae0640, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 779> != <code object _python_set_elements_oos at 0x7d1d25b25230, file "/home/smartgrid/anaconda3/envs/new/lib/python3.12/site-packages/pandapower/auxiliary.py", line 756>

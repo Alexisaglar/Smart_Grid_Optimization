@@ -1,6 +1,8 @@
+from os import wait
 import sys
 from typing import Tuple
 from numpy._core.multiarray import ndarray
+from numpy.random import weibull
 import pandas as pd
 import pandapower as pp
 import pandapower.networks as pn
@@ -22,7 +24,7 @@ power_battery = np.zeros((network, horizon))
 power_battery_available = np.zeros((network, horizon))
 power_battery_required = np.zeros((network, horizon))
 power_bus = np.zeros((network, 2, horizon))
-state_of_charge = np.zeros((network, horizon))
+bss_state_of_charge = np.zeros((network, horizon))
 remain_power = np.zeros((network, horizon))
 
 # Default values
@@ -108,7 +110,7 @@ def generate_loads(
 
         # this multiplies a p_base which is of length 33*1, multiplying 33*24
         p_time = p_base * factors
-        q_time = p_base * factors
+        q_time = q_base * factors
 
         # make 3d stack (buses, values, time)
         loads = np.stack([p_time, q_time], axis=1)
@@ -131,14 +133,18 @@ def network_results(
         0.12, 0.1, 0.05, 0.045, 0.03, 0.01, 0, 0, 0, 0, 0, 0
     ]
 
+    ev_state_of_charge = np.zeros((network, horizon))
+    power_ev_required = np.zeros((network, horizon))
+    ev_power = np.zeros((network, horizon))
 
     for t in range(horizon):
+        print('*' * 50 + f' THIS IS TIME {t} ' +'*' * 50)
         power_bus = power_demand
         # Determine the resource state of each bus:
         for bus in pv_bus:
-            power_battery_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
-            power_battery_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
-            print(f'Power_required: {power_battery_required[bus,t]}, power_available: {power_battery_available[bus,t]}, previous_soc: {state_of_charge[bus, t]}')
+            power_battery_available[bus, t] = (bss_state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
+            power_battery_required[bus, t] = ((100 - bss_state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
+            print(f'Power_required: {power_battery_required[bus,t]}, power_available: {power_battery_available[bus,t]}, previous_soc: {bss_state_of_charge[bus, t]}')
 
             # Discharging state
             if pv_power[t] <= power_demand[bus, 0, t]:
@@ -161,49 +167,66 @@ def network_results(
                 )
                 print(f'State: {state}, power_battery: {power_battery[bus,t]}')
 
-            state_of_charge[bus, t] = update_battery_values(
-                state_of_charge[bus, t-1],
+            bss_state_of_charge[bus, t] = update_battery_values(
+                bss_state_of_charge[bus, t-1],
                 power_battery[bus, t],
                 state,
             ) 
 
             power_bus[bus, 0, t] = power_demand[bus, 0, t] - pv_power[t] + power_battery[bus, t]
+            print(f'state of charge of bss_pv {bus} at time {t}: {bss_state_of_charge[bus,t]}')
 
         for ev in ev_data.index:
             # how do we determine that the EV is in the charging station?
             # we create the available range by arrival and departure values
-            ev_power = np.zeros((24, 33))
-            if t <= ev_data.departure.iloc[ev] or t >= ev_data.arrival.iloc[ev]:
+            arrival = ev_data.loc[ev, 'arrival']
+            departure = ev_data.loc[ev, 'departure']
+
+            if t >= arrival or t < departure:
+                # print(f"EV {ev} is parked (arrived at {arrival}), leaves at {departure}")
+                if t == arrival:
+                    ev_state_of_charge[ev, t] = ev_data.loc[ev, 'soc_at_arrival']
+
+                power_ev_required[ev, t] = ((100 - ev_state_of_charge[ev, t-1]) * (ev_data.loc[ev, 'battery_capacity']) * BATTERY_CHARGE_EFF) / DELTA_T 
+
+                if ev_state_of_charge[ev, t] <= 100:
+                    ev_power[ev, t] = min(
+                        # (pv_power[t] - power_demand[bus, 0, t]), V2G enabled this should change
+                        power_ev_required[ev, t],
+                        POWER_BATTERY_CHARGE_MAX, 
+                    )
+                    state = 'charge'
+                    ev_state_of_charge[ev, t] = update_battery_values(
+                        ev_state_of_charge[ev, t-1],
+                        ev_power[ev, t],
+                        state,
+                        battery_capacity=ev_data.loc[ev, 'battery_capacity']
+                    )
+                    print(ev_state_of_charge[ev,t])
+
                 print(f'time: {t}')
-                # time.sleep(1)
-                # power_ev_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
-                # power_ev_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
+                print(f'state of charge of vehicle {ev}, at time {t}: {ev_state_of_charge[ev,t]}')
 
-            #
-            #
-            # if ev in station:
-            #     pass
-            #
-            # if horizon in np.arange(ev_data.iloc[bus].arrival, ev_data.departure).any(): 
-            #     power_ev_available[bus, t] = (state_of_charge[bus, t-1] * BATTERY_TOTAL_CAPACITY) / (BATTERY_DISCHARGE_EFF * DELTA_T) 
-            #     power_ev_required[bus, t] = ((100 - state_of_charge[bus, t-1]) * BATTERY_TOTAL_CAPACITY * BATTERY_CHARGE_EFF) / DELTA_T 
-            #     if ev_data.soc_at_arrival != 100:
-            #         state = 'charge'
-            #         power_ev = update_battery_values(ev_data.soc_at_arrival, ev_data.battery_capacity,)
-            #
-            #     if V2G_enables == True :
+            #     if V2G_enabled == True :
             #         state = 'discharge'
-            # pass
-            #
 
 
 
 
-        net.load.p_mw = power_demand[1:, 0, t]
+        net.load.p_mw = power_demand[1:, 0, t] - ev_power[1:, t]
+        plt.plot(net.load.p_mw, label='power with PV and EV')
+        plt.plot(power_bus[1:, 0, t], label='power with pv')
+        plt.plot(power_demand[1:, 0, t], label='power_demand with PV')
+        plt.plot(ev_power[1:, t], label='ev_power')
+        plt.plot(power_battery[1:, t], label='power battery')
+        plt.legend()
+        plt.show()
         pp.runpp(net)
 
         print('*' * 50 + f' Power flow results at time: {t} ' +'*' * 50)
         print(f'p_mw: {net.res_load.p_mw.T}, voltage_pu: {net.res_bus.vm_pu.T}')
+    plt.plot(ev_state_of_charge[28, :])
+    plt.show()
 
 def update_battery_values(
     previous_soc: float,
@@ -216,11 +239,11 @@ def update_battery_values(
 ) -> float:
     match state:
         case 'charge':
-            state_of_charge = previous_soc + ((power_battery * delta_t / battery_capacity * discharge_eff)/100)
+            state_of_charge = previous_soc + ((power_battery * delta_t / battery_capacity * discharge_eff))
             return state_of_charge
 
         case 'discharge':
-            state_of_charge = previous_soc + ((power_battery * delta_t * charging_eff / battery_capacity)/100)
+            state_of_charge = previous_soc + ((power_battery * delta_t * charging_eff / battery_capacity))
             return state_of_charge
 
 def generate_ev_data(
@@ -234,7 +257,7 @@ def generate_ev_data(
         ev_data['arrival'] = np.random.randint(low=16, high=20, size=len(ev_bus))
         ev_data['departure'] = np.random.randint(low=6, high=10, size=len(ev_bus))
         # ev_data['range_at_station'] = [np.arange(ev_data['arrival'].iloc[i], ev_data['departure'].iloc[i]) for i in range(len(ev_data))]
-        ev_data['battery_capacity'] = np.random.randint(low=50, high=70, size=len(ev_bus))
+        ev_data['battery_capacity'] = np.random.randint(low=50, high=70, size=len(ev_bus)) / 1000
         ev_data['soc_at_arrival'] = np.random.randint(low=0, high=50, size=len(ev_bus))
 
     # For testing purposes generate a stable constant arrival/departure/soc
@@ -242,9 +265,11 @@ def generate_ev_data(
         ev_data['arrival'] = np.full(shape=len(ev_bus), fill_value=17)
         ev_data['departure'] = np.full(shape=len(ev_bus), fill_value=8)
         # ev_data['range_at_station'] = [np.arange(ev_data['arrival'].iloc[i], ev_data['departure'].iloc[i], 1) for i in range(len(ev_data))]
-        ev_data['battery_capacity'] = np.full(shape=len(ev_bus), fill_value=17)
+        ev_data['battery_capacity'] = np.full(shape=len(ev_bus), fill_value=50) / 1000
         ev_data['soc_at_arrival'] = np.full(shape=len(ev_bus), fill_value=50)
-        pass
+        # pass
+    ev_data = ev_data.set_index('bus_idx')
+    print(ev_data)
 
     return ev_data
 
