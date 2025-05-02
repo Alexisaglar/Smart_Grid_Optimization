@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import config
+import examples.config as config
 
 def calculate_pv_power_mw(time_steps, parking_lot_id):
     """
