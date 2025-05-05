@@ -11,10 +11,10 @@ def setup_pandapower_network() -> pp.pandapowerNet:
 
     net = pn.case33bw()
 
-    net.bus['ev_id'] = False
+    net.bus['ev_idx'] = False
     for _, bus_index in enumerate(config.EV_INDICES):
         if bus_index in net.bus.index:
-            net.bus.loc[bus_index, 'ev_id'] = True
+            net.bus.loc[bus_index, 'ev_idx'] = True
         else:
             print(f"Warning: Parking lot bus index {bus_index} not found in the network")
 

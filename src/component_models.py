@@ -40,7 +40,7 @@ def generate_ev_data(
 
     num_total_evs = ev_per_lot * len(ev_idx)
     ev_data = pd.DataFrame()
-    ev_data['bus_idx'] = ev_idx
+    ev_data['ev_idx'] = ev_idx
 
     max_powers = config.EV_MAX_POWER_MW
     min_powers = config.EV_MIN_POWER_MW
@@ -50,9 +50,10 @@ def generate_ev_data(
     soc_at_arrival = np.random.randint(low=0, high=50, size=len(ev_idx))
     lot_id = np.zeros((len(ev_idx)))
 
+    print(max_powers)
     # Create DataFrame
     ev_data = pd.DataFrame({
-        'ev_id': ev_idx,
+        'ev_idx': ev_idx,
         'lot_id': lot_id,
         'capacity_mwh': capacity_mwh,
         'max_power_mw': max_powers,

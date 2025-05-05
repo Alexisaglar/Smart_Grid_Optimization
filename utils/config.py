@@ -59,7 +59,7 @@ NUM_EVS_PER_LOT = 1 # Vpl * num_types # CHANGED FROM 10 to 1
 EV_TYPES_CAPACITY_MWH = np.array([24, 22, 28, 85, 24, 23, 27, 16, 17, 24]) / 1000 # kWh -> MWh
 # EV max charging powers (MW) - based on MATLAB 'Charging'
 # Example: 7.2 / 1000 = 0.0072 MW
-EV_MAX_POWER_MW = np.array([7.2, 6.6, 10, 17.2, 6.6, 6.6]) / 1000 # kW -> MW
+EV_MAX_POWER_MW = np.array([7.2, 6.6, 10, 17.2, 6.6]) / 1000 # kW -> MW
 EV_MIN_POWER_MW = -EV_MAX_POWER_MW
 
 EV_CHARGING_EFFICIENCY = 0.90 # effC
