@@ -25,10 +25,10 @@ def run_simulation():
     for bus_idx in range(len(config.PV_BUSES)):
         pv_power_forecasts[bus_idx, :] = component_models.calculate_pv_power_mw(time_steps, bus_idx)
 
-    # --- Optimization ---
+    # --- Optimization ---ev_p, bess_p, grid_p, bess_soc, ev_soc, obj, status
     (solved_ev_power, solved_bess_power, solved_bess_soc,
-     solved_total_vpp_power, objective_value, status) = optimisation.solve_VPP_optimisation(
-         ev_data, ev_present_matrix, pv_power_forecasts
+     solved_total_vpp_power, objective_value, ev_soc, status) = optimisation.solve_VPP_optimisation(
+         ev_data, ev_present_matrix, pv_power_forecasts, config.LOAD_PROFILE
      )
 
     if status not in [cp.OPTIMAL, cp.OPTIMAL_INACCURATE]:

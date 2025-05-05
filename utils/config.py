@@ -37,6 +37,7 @@ NUM_EVS_PER_LOT = 1 # Vpl * num_types # CHANGED FROM 10 to 1
 EV_CHARGING_EFFICIENCY = 0.90 # effC
 EV_DISCHARGING_EFFICIENCY = 0.90 # effD (for V2G)
 EV_MIN_SOC = 0.30 # minSOC0
+EV_MAX_SOC = 0.90 # minSOC0
 EV_TARGET_SOC = 0.90 # maxSOC0 (used as target)
 
 
