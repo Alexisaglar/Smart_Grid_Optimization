@@ -39,7 +39,6 @@ class PvSystem:
             EgRef=self.parameters['EgRef'],
             dEgdT=self.parameters['dEgdT']
         )
-        
         curve_info = pvsystem.singlediode(
             photocurrent=light_current,
             saturation_current=saturation_current,
@@ -49,9 +48,7 @@ class PvSystem:
             method='lambertw'
         )
 
-        sd_output = curve_info['v_mp'] * curve_info['i_mp']
-
-        return sd_output
+        return (curve_info['v_mp'] * curve_info['i_mp'])
 
     def _emerging_pv_method(
         self,
