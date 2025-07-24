@@ -1,38 +1,44 @@
-from ast import Name
-import pandas as pd
-import numpy as np
+import pandapower as pp
 
 class BatterySystem:
     def __init__(
         self,
-        capacity_kWh: float,
-        max_charge_percentage: float,
-        min_charge_percentage: float,
+        net: pp.pandapowerNet,
+        bus_idx: int,
+        capacity_mwh: float,
+        max_energy_mwh: float,
+        min_energy_mwh: float,
         charge_efficiency: float,
         discharge_efficiency: float,
-        initial_SoC: int
+        max_p_mw: float,
+        min_p_mw: float,
+        initial_soc_percent: float,
+        name: str = None,
     ) -> None:
-        self.capacity = capacity_kWh
-        self.max_soc = max_charge_percentage
-        self.min_soc = min_charge_percentage
+        self.capacity_mwh = capacity_mwh
         self.charge_efficiency = charge_efficiency
         self.discharge_efficiency = discharge_efficiency
-        self.soc_history = [initial_SoC]
+        self.soc_history = [initial_soc_percent]
+        self.net = net
 
-    def update_soc(
-        self,
-        new_soc: float
-    ) -> None:
-        if not isinstance(new_soc, (int, float)):
-            raise TypeError(f"New SoC is not a number: {new_soc}")
+        self.bess_idx = pp.create_storage(
+            net,
+            bus=bus_idx,
+            p_mw=0.0,
+            max_e_mwh=max_energy_mwh,
+            min_e_mwh=min_energy_mwh,
+            soc_percent=initial_soc_percent,
+            max_p_mw=max_p_mw,
+            min_p_mw=min_p_mw,
+            q_mvar=0.0,
+            name=name,
+            in_service=True,
+        )
 
-        if new_soc > 100 or new_soc < 0:
-            raise ValueError(f"The new SoC has to be in [0, 100] range; new SoC: {new_soc}")
-        self.soc_history.append(new_soc)
-    
-    def actual_soc(self) -> None:
-        if not self.soc_history:
-            raise ValueError("Array is empty")
-        print(f"Actual SoC: {self.soc_history[-1]}")
+    def update_power(self, p_mw: float) -> None:
+        """Sets the charging/discharging power of the BESS in the pandapower network."""
+        self.net.storage.p_mw[self.bess_idx] = p_mw
 
-
+    def get_current_soc(self) -> float:
+        """Gets the current SoC from the pandapower results after a power flow."""
+        return self.net.res_storage.soc_percent[self.bess_idx]

@@ -2,15 +2,26 @@ from pvlib import pvsystem
 import pandas as pd
 from typing import Dict
 import numpy as np
+import pandapower as pp
 
 class PvSystem:
     def __init__(
         self,
+        net: pp.pandapowerNet,
+        bus_idx: int,
+        name: str,
         pv_parameters: Dict[str, float],
         peak_power_kW: float,
     ) -> None:
         self.parameters = pv_parameters
         self.peak_power = peak_power_kW 
+
+        self.pv_idx = pp.create_sgen(
+            net,
+            bus=18,
+            p_mw=0.0,
+            name=name
+        )
 
     def _beta(self, temperature) -> pd.DataFrame:
         return (self.parameters['sd_t_c'] - self.parameters['epv_t_c']) * temperature 
