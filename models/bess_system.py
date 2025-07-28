@@ -3,7 +3,7 @@ import pandapower as pp
 class BatterySystem:
     def __init__(
         self,
-        net: pp.pandapowerNet,
+        network: pp.pandapowerNet,
         bus_idx: int,
         capacity_mwh: float,
         max_energy_mwh: float,
@@ -19,10 +19,11 @@ class BatterySystem:
         self.charge_efficiency = charge_efficiency
         self.discharge_efficiency = discharge_efficiency
         self.soc_history = [initial_soc_percent]
-        self.net = net
+        self.name = name
+        # self.net = net
 
         self.bess_idx = pp.create_storage(
-            net,
+            network,
             bus=bus_idx,
             p_mw=0.0,
             max_e_mwh=max_energy_mwh,

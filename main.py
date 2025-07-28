@@ -1,14 +1,57 @@
+from pandapower import optimal_powerflow
+import pyomo.environ as pyo
+import numpy as np
 import pandas as pd
 from models.pv_system import PvSystem
 from models.bess_system import BatterySystem
 from models.smart_grid import Bus 
+from utils import pv_parameters
 from utils.system_parameters import *
 from typing import Dict
+from pandapower.plotting.plotly import pf_res_plotly
 
 import pandapower as pp
 import pandapower.networks as nw
 
+import matplotlib.pyplot as plt
+
 TIME_HORIZON = 24
+
+def calculate_optimal_schedule(
+    pv_forecasts: Dict[str, float],
+    load_forecasts: np.array,
+    grid_price: list,
+    forecast_range: int, 
+) -> pd.DataFrame:
+    model = pyo.ConcreteModel("BESS Optimal Dispatch")
+
+    # Define sets:
+    model.T = pyo.RangeSet(0, forecast_range - 1) # time steps
+    model.BESS_IDs = pyo.Set(initialize=[bess_emerging.name, bess_silicon.name])
+    # model.PV_IDs = pyo.Set(initialize=[pv_emerging.name, pv_silicon.name])
+
+    # Define variables:
+    model.p_bess = pyo.Var(model.BESS_IDs, model.T, domain=pyo.Reals)
+    model.soc_bess = pyo.Var(model.BESS_IDs, model.T, domain=pyo.NonNegativeReals, bounds=(0, 1))
+    model.p_grid_import = pyo.Var(model.T, domain=pyo.NonNegativeReals)
+    model.p_grid_export = pyo.Var(model.T, domain=pyo.NonNegativeReals)
+
+
+    # Define objective function:
+    def objective_function(model):
+        return sum(model.p_grid[t] * grid_price[t] for t in model.T)
+    model.objective = pyo.Objective(rule=objective_function, sense=pyo.minimize))
+
+    # Define constraints
+    def power_balance_constraints(model, t):
+        return
+        # total_pv_gen = sum(pv_forecasts[pv_id][t] for pv_id in pv_forecasts)
+        # total_bess_dispatch = sum(model.p_bess[bess_id][t] for bess_id in model.BESS_IDs)
+        # net_power = load_forecasts[t] - total_pv_gen - total_bess_dispatch
+        #    
+
+    return 
+
 
 def initialise_network(case: str) -> None:
     if case != 'case33bw':
@@ -16,133 +59,89 @@ def initialise_network(case: str) -> None:
         raise NotImplementedError(f"Case '{case}' is not implemented.")
     return nw.case33bw()
 
-
-# def run_power_flow(
-#     network: pd.DataFrame,
-#     load_t: list,
-#     pv_power: list,
-# ) -> None:
-#     pp.runopp(network)
-#     # Corresponding pandapower elements
-#     pp.create_sgen(
-#         network,
-#         bus=18,
-#         p_mw=0.0,
-#         name="Silicon PV"
-#     )
-
-
 def create_pv_system(
-    name: str,
-    pv_parameters: Dict[str, float],
-    pv_capacity: float,
+    network: pp.pandapowerNet,
     bus_idx: int,
+    pv_parameters: Dict[str, float],
+    name: str,
 ) -> PvSystem:
     if not network:
         print('Unable to create a bess system, no network is declared')
         return
-    pv = PvSystem(pv_parameters, pv_capacity)
-    pp.create_sgen(
-        network,
-        bus=bus_idx,
-        p_mw=0.0,
-        name=name
+
+    pv = PvSystem(
+        network=network,
+        bus_idx=bus_idx,
+        pv_parameters=pv_parameters,
+        name=name,
     )
+
     return pv
 
 def create_bess_system(
-    name: str,
+    network: pp.pandapowerNet,
     bus_idx: int,
-    battery_capacity: float,
-    max_energy_mwh: float,
-    min_energy_mwh: float,
-    charge_efficiency: float,
-    discharge_efficiency: float,
-    max_p_mw: float,
-    min_p_mw: float,
     initial_soc: float,
+    name: str,
 ) -> BatterySystem:
+ 
     if not network:
         print('Unable to create a bess system, no network initialised')
         return
 
     bess = BatterySystem(
-        battery_capacity,
-        max_energy_mwh,
-        min_energy_mwh,
-        max_p_mw,
-        min_p_mw,
-        charge_efficiency,
-        discharge_efficiency,
-        initial_soc,
-    )
-
-    pp.create_storage(
-        network,
-        bus=bus_idx,
-        max_e_mwh=max_energy_mwh,
-        min_e_mwh=min_energy_mwh,
-        soc_percent=initial_soc,
-        max_p_mw=max_p_mw,
-        min_p_mw=min_p_mw,
-        name=name,
-    )
-
-    return bess 
-
-    
-if __name__ == "__main__":
-    network = initialise_network('case33bw')
-    pv_silicon = PvSystem(
-            net=network,
-            bus_idx=17,
-            pv_parameters=SILICON_PV_PARAMETERS,
-            peak_power_kW=PV_CAPACITY,
-            name="Silicon_PV",
-        )
-
-    pv_emerging = PvSystem(
-        net=network,
-        bus_idx=15,
-        pv_parameters=EMERGING_PV_PARAMETERS,
-        peak_power_kW=PV_CAPACITY,
-        name="Emerging_PV",
-    )
-
-    # 3. Create BESS systems (they also add themselves to the network)
-    bess_system_1 = BatterySystem(
-        net=network,
-        bus_idx=18,
+        network=network,
+        bus_idx=bus_idx,
         capacity_mwh=BATTERY_CAPACITY,
         max_energy_mwh=MAX_SOC_CHARGE,
         min_energy_mwh=MIN_SOC_CHARGE,
         charge_efficiency=CHARGE_EFFICIENCY,
         discharge_efficiency=DISCHARGE_EFFICIENCY,
-        max_p_mw=2.0,
-        min_p_mw=-2.0, # Assuming min_p_mw is for charging
-        initial_soc_percent=0.50,
-        name="BESS_1",
+        max_p_mw=MAX_P_BESS,
+        min_p_mw=-MIN_P_BESS,
+        initial_soc_percent=initial_soc,
+        name=name,
+    )
+    return bess 
+
+    
+if __name__ == "__main__":
+    network = initialise_network('case33bw')
+
+    pv_silicon = PvSystem(
+        network=network,
+        bus_idx=17,
+        pv_parameters=SILICON_PV_PARAMETERS,
+        name="silicon_pv",
+    )
+    pv_emerging = PvSystem(
+        network=network,
+        bus_idx=16,
+        pv_parameters=EMERGING_PV_PARAMETERS,
+        name="emerging_pv",
     )
 
-    # Now your `network` object contains all the elements,
-    # and your custom objects (`pv_silicon`, `bess_system_1`) are the
-    # controllers for those elements.
-    print(network)
+    bess_emerging = create_bess_system(
+        network=network,
+        bus_idx=16,
+        initial_soc=0.5,
+        name="emerging_bess"
+    )
+    bess_silicon = create_bess_system(
+        network=network,
+        bus_idx=17,
+        initial_soc=0.5,
+        name="silicon_bess"
+    )
 
-    # Example of running a simulation step:
-    # a. Calculate PV power from weather data
-    # pv_power_mw = pv_silicon.power_generation(temp, irradiance) / 1000 # Convert kW to MW
+    pv_silicon.update_generation(25, 700)
+    pv_emerging.update_generation(25, 700)
 
-    # b. Update the power in the network using your new method
-    # pv_silicon.update_power(pv_power_mw)
-
-    # c. Set a dispatch for the battery
-    # bess_system_1.update_power(-1.5) # Charge at 1.5 MW
-
+    calculate_optimal_schedule([1,3,5],[0,1,2,3], [0,4,5], 24)
     # d. Run power flow
-    pp.runpp(network)
-
-    # e. Get results
-    current_soc = bess_system_1.get_current_soc()
-    print(network)
-    
+    # pp.runopp(network, verbose=True)
+    # # print(network.sgen.pv_emerging)
+    # plt.plot(network.res_bus.p_mw[1:])
+    # plt.show()
+    # plt.plot(network.res_bus.vm_pu[1:])
+    # plt.show()
