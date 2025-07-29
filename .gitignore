@@ -1,6 +1,7 @@
 optimisation/
 tftenv/
-*__pycache__*
+*/__pycache__/
+__pycache__/
 lightning_logs/
 
 
