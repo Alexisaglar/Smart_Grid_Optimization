@@ -249,8 +249,8 @@ if __name__ == "__main__":
         name="silicon_bess"
     )
     pv_forecasts_data = {
-        "pv_silicon": np.random.rand(24) * 0.5, # 24h forecast for silicon PV
-        "pv_emerging": np.random.rand(24) * 0.3  # 24h forecast for emerging PV
+        "pv_silicon": np.concatenate([np.zeros(6), (np.random.rand(12) * 0.5), np.zeros(6)]), # 24h forecast for silicon PV
+        "pv_emerging": np.concatenate([np.zeros(6), (np.random.rand(12) * 0.5), np.zeros(6)])  # 24h forecast for emerging PV
     }
     total_load_forecast = network.load.p_mw.sum() * (np.sin(np.linspace(0, 2*np.pi, 24)) * 0.4 + 0.8)
     grid_price_data = np.array([10,10,10,10,15,20,50,60,50,40,30,20] * 2) # Simple price profile
@@ -267,7 +267,6 @@ if __name__ == "__main__":
             "charge_eff": 0.92, "discharge_eff": 0.92
         }
     }
-    print([ bess.name for bess in [bess_silicon, bess_emerging]])
     optimal_schedule_df = calculate_optimal_schedule(
         pv_forecasts=pv_forecasts_data,
         load_forecasts=total_load_forecast,
