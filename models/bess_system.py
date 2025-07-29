@@ -16,9 +16,15 @@ class BatterySystem:
         name: str = None,
     ) -> None:
         self.capacity_mwh = capacity_mwh
+        # self.bus_idx = bus_idx
         self.charge_efficiency = charge_efficiency
         self.discharge_efficiency = discharge_efficiency
         self.soc_history = [initial_soc_percent]
+        self.max_e_mwh = max_energy_mwh
+        self.min_e_mwh = min_energy_mwh
+        self.initial_soc = initial_soc_percent
+        self.max_p_mw = max_p_mw
+        self.min_p_mw = min_p_mw
         self.name = name
         # self.net = net
 
@@ -26,11 +32,11 @@ class BatterySystem:
             network,
             bus=bus_idx,
             p_mw=0.0,
-            max_e_mwh=max_energy_mwh,
-            min_e_mwh=min_energy_mwh,
-            soc_percent=initial_soc_percent,
-            max_p_mw=max_p_mw,
-            min_p_mw=min_p_mw,
+            max_e_mwh=self.max_e_mwh,
+            min_e_mwh=self.min_e_mwh,
+            soc_percent=self.initial_soc,
+            max_p_mw=self.max_p_mw,
+            min_p_mw=self.min_p_mw,
             q_mvar=0.0,
             name=name,
             in_service=True,
