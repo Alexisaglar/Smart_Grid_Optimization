@@ -10,11 +10,13 @@ class PvSystem:
         network: pp.pandapowerNet,
         bus_idx: int,
         pv_parameters: Dict[str, float],
+        forecast: list,
         name: str,
     ) -> None:
         self.network = network
         self.parameters = pv_parameters
         self.name = name
+        self.forecast = forecast
         # self.peak_power = self.parameters['peak_power_kW'] 
 
         self.pv_idx = pp.create_sgen(

@@ -387,7 +387,7 @@ def main():
         # irradiance model
         # ckpt = "lightning_logs/tft_run/version_13/checkpoints/tft-epoch=43-val_loss=3.6114.ckpt"
         # temperature model
-        ckpt = "models/trained_model.ckpt"
+        ckpt = "models/irradiance_model.ckpt"
         preds, targets = evaluate(ckpt, val_loader, args.plot_date)
 
         print(preds, "\n", targets)

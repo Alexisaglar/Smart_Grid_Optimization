@@ -28,7 +28,7 @@ class BatterySystem:
         self.name = name
         # self.net = net
 
-        self.bess_idx = pp.create_storage(
+        self.bus_idx = pp.create_storage(
             network,
             bus=bus_idx,
             p_mw=0.0,
