@@ -5,6 +5,8 @@ import pandapower as pp
 import pandapower.networks as nw
 import matplotlib.pyplot as plt
 import seaborn as sns # Add this import to the top of your file
+# from models.pv_system import PvSystem
+# from models.bess_system import PvSystem
 
 # --- Placeholder classes (unchanged) ---
 class PvSystem:
@@ -133,8 +135,8 @@ def calculate_full_schedule(
 
 
     # Control Variables
-    model.p_curt = pyo.Var(model.BUS_IDs, model.T, domain=pyo.NonNegativeReals)
-    model.c_inc = pyo.Var(model.T, domain=pyo.NonNegativeReals) # Incentive rate in £/MWh
+    model.p_curtailment = pyo.Var(model.BUS_IDs, model.T, domain=pyo.NonNegativeReals)
+    model.c_incentive = pyo.Var(model.T, domain=pyo.NonNegativeReals)
     model.p_grid = pyo.Var(model.T, domain=pyo.Reals)
     model.q_grid = pyo.Var(model.T, domain=pyo.Reals)
     model.p_flow = pyo.Var(model.T, model.LINE_IDs, domain=pyo.Reals)
@@ -148,11 +150,11 @@ def calculate_full_schedule(
 
     # if we have demand response:
     if enable_dr:
-        model.p_curt = pyo.Var(model.BUS_IDs, model.T, domain=pyo.NonNegativeReals)
-        model.c_inc = pyo.Var(model.T, domain=pyo.NonNegativeReals)
+        model.p_curtailment = pyo.Var(model.BUS_IDs, model.T, domain=pyo.NonNegativeReals)
+        model.c_incentive = pyo.Var(model.T, domain=pyo.NonNegativeReals)
     else:
         # If DR is disabled, create an empty variable to avoid errors
-        model.p_curt = pyo.Param(model.BUS_IDs, model.T, default=0)
+        model.p_curtailment = pyo.Param(model.BUS_IDs, model.T, default=0)
 
     # Objective Function 
     def full_objective_rule(model):
@@ -165,7 +167,7 @@ def calculate_full_schedule(
         incentive_cost = 0
         if enable_dr:
             incentive_cost = sum(
-                model.c_inc[t] * model.p_curt[i, t]
+                model.c_incentive[t] * model.p_curtailment[i, t]
                 for i in model.BUS_IDs if i in base_loads_p.index for t in model.T
             )
         return grid_cost + degradation_cost + incentive_cost
@@ -181,7 +183,7 @@ def calculate_full_schedule(
         grid_inj = model.p_grid[t] if i == slack_bus_id else 0
         load_p = base_loads_p.get(i, 0) * (load_forecasts / load_forecasts.max())[t]
         base_load_p = base_loads_p.get(i, 0) * (load_forecasts / load_forecasts.max())[t]
-        curtailed_load_p = model.p_curt[i, t]
+        curtailed_load_p = model.p_curtailment[i, t]
         actual_load_p = base_load_p - curtailed_load_p
         return (pv_gen + bess_dispatch + grid_inj + flow_in - flow_out - actual_load_p) == 0
     model.active_power_balance = pyo.Constraint(model.T, model.BUS_IDs, rule=active_power_balance_rule)
@@ -190,9 +192,9 @@ def calculate_full_schedule(
         # Max curtailment per hour
         def max_curtailment_rule(model, i, t):
             if i not in base_loads_p.index:
-                return model.p_curt[i, t] == 0 # No load to curtail at this bus
+                return model.p_curtailment[i, t] == 0 # No load to curtail at this bus
             base_load_p = base_loads_p.get(i, 0) * (load_forecasts / load_forecasts.max())[t]
-            return model.p_curt[i, t] <= 0.60 * base_load_p
+            return model.p_curtailment[i, t] <= 0.60 * base_load_p
         model.max_curtailment_constraint = pyo.Constraint(model.BUS_IDs, model.T, rule=max_curtailment_rule)
 
         # Total energy curtailment limit over the horizon
@@ -200,7 +202,7 @@ def calculate_full_schedule(
             if i not in base_loads_p.index:
                 return pyo.Constraint.Skip # Skip buses with no load
             total_base_energy = sum(base_loads_p.get(i, 0) * (load_forecasts / load_forecasts.max())[t] for t in model.T)
-            total_curtailed_energy = sum(model.p_curt[i, t] for t in model.T)
+            total_curtailed_energy = sum(model.p_curtailment[i, t] for t in model.T)
             return total_curtailed_energy <= 0.40 * total_base_energy
         model.total_energy_curtailment_constraint = pyo.Constraint(model.BUS_IDs, rule=total_energy_curtailment_rule)
 
@@ -212,8 +214,8 @@ def calculate_full_schedule(
             beta = 0.1 
             xi = 0.5 
             
-            incentive_earned = sum(xi * model.c_inc[t] * model.p_curt[i, t] for t in model.T)
-            discomfort_cost = sum((1 - xi) * beta * (model.p_curt[i, t]**2) for t in model.T)
+            incentive_earned = sum(xi * model.c_incentive[t] * model.p_curtailment[i, t] for t in model.T)
+            discomfort_cost = sum((1 - xi) * beta * (model.p_curtailment[i, t]**2) for t in model.T)
             
             return incentive_earned >= discomfort_cost
         model.consumer_benefit_constraint = pyo.Constraint(model.BUS_IDs, rule=consumer_benefit_rule)
@@ -222,7 +224,7 @@ def calculate_full_schedule(
         min_price = grid_price.min()
         max_price = grid_price.max()
         def incentive_bounds_rule(model, t):
-            return pyo.inequality(0.5 * min_price, model.c_inc[t], max_price)
+            return pyo.inequality(0.5 * min_price, model.c_incentive[t], max_price)
         model.incentive_bounds = pyo.Constraint(model.T, rule=incentive_bounds_rule)
 
     def soc_evolution_rule(model, b_name, t):
@@ -446,11 +448,14 @@ def calculate_total_cost(schedule_df, grid_price, bess_objects):
 if __name__ == "__main__":
     # This section is identical to the previous script
     network = nw.case33bw()
-    pv_silicon = PvSystem(network=network, bus_idx=17, pv_parameters={},
-                          forecast=np.concatenate([np.zeros(6),
-                                                   np.sin(np.linspace(0, np.pi, 12)) * 0.9,
-                                                   np.zeros(6)]),
-                          name="silicon_pv")
+    pv_silicon = PvSystem(
+        network=network,
+        bus_idx=17,
+        pv_parameters={},
+        forecast=np.concatenate([np.zeros(6),
+                                np.sin(np.linspace(0, np.pi, 12)) * 0.9,
+                                np.zeros(6)]),
+                                name="silicon_pv")
     pv_emerging = PvSystem(network=network, bus_idx=16, pv_parameters={},
                            forecast=np.concatenate([np.zeros(6),
                                                     np.sin(np.linspace(0, np.pi, 12)) * 0.9,
