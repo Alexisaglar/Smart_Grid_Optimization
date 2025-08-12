@@ -95,48 +95,89 @@ def feature_processing(df: pd.DataFrame) -> pd.DataFrame:
     Create calendar, wind and lag features based on datetime
     """
     try:
-        # Categorical time features
-        df['month'] = df['datetime'].dt.year * 12 + df['datetime'].dt.month
-        df['month'] -= df['month'].min()
-        df['month'] = df['month'].astype(str).astype("category")
-
+        # --- REVISED: Create repeating categorical features ---
+        df['month'] = df['datetime'].dt.month.astype(str).astype("category")
         df["hour"] = df['datetime'].dt.hour.astype(str).astype("category")
+        df['day_of_month'] = df['datetime'].dt.day.astype(str).astype("category") # Renamed for clarity
+        df['day_of_week'] = df['datetime'].dt.dayofweek.astype(str).astype("category")
 
-        df['day'] = df['datetime'].dt.year * 365 + df['datetime'].dt.day
-        df['day'] -= df['day'].min()
-        df['day'] = df['day'].astype(str).astype("category")
-
-        df['day_of_week'] = df['datetime'].dt.dayofweek
-        df['day_of_week'] = df['day_of_week'].astype(str).astype("category")
-
-        # seasonal cycle
+        # seasonal cycle (this is very important and correctly implemented)
         doy = df['datetime'].dt.dayofyear
         df["sin_doy"] = np.sin(2 * np.pi * doy / 365.25)
         df["cos_doy"] = np.cos(2 * np.pi * doy / 365.25)
 
-        # wind features
+        # wind features (correctly implemented)
         df['wind_speed'] = np.sqrt(df['u10']**2 + df['v10']**2)
         df['wind_dir'] = np.degrees(np.arctan2(df['v10'], df['u10'])) % 360
         df['sin_wdir'] = np.sin(np.deg2rad(df['wind_dir']))
         df['cos_wdir'] = np.cos(np.deg2rad(df['wind_dir']))
 
-        # Convert to Kelvin from Celsius as TFT doesn't accept negative values
+        # Convert to Kelvin (correctly implemented)
         df['t2m'] = df['t2m'] + 273.15 
 
-        # single site group id
+        # single site group id (correctly implemented)
         df['group_id'] = 'site0-NCL'
         df['group_id'] = df['group_id'].astype('category')
 
-        # lag feature
+        # lag feature (correctly implemented)
         df = df.sort_values(['group_id', 'time_idx'])
         df['t2m_lag24'] = df.groupby('group_id')['t2m'].shift(24)
         df = df.dropna(subset=['t2m_lag24']).reset_index(drop=True)
+        
     except Exception:
         logger.exception("Error while processing new categorical features")
         raise
 
     print(f'DF processed:\n{df.describe()}')
     return df
+
+# def feature_processing(df: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Create calendar, wind and lag features based on datetime
+#     """
+#     try:
+#         # Categorical time features
+#         df['month'] = df['datetime'].dt.year * 12 + df['datetime'].dt.month
+#         df['month'] -= df['month'].min()
+#         df['month'] = df['month'].astype(str).astype("category")
+#
+#         df["hour"] = df['datetime'].dt.hour.astype(str).astype("category")
+#
+#         df['day'] = df['datetime'].dt.year * 365 + df['datetime'].dt.day
+#         df['day'] -= df['day'].min()
+#         df['day'] = df['day'].astype(str).astype("category")
+#
+#         df['day_of_week'] = df['datetime'].dt.dayofweek
+#         df['day_of_week'] = df['day_of_week'].astype(str).astype("category")
+#
+#         # seasonal cycle
+#         doy = df['datetime'].dt.dayofyear
+#         df["sin_doy"] = np.sin(2 * np.pi * doy / 365.25)
+#         df["cos_doy"] = np.cos(2 * np.pi * doy / 365.25)
+#
+#         # wind features
+#         df['wind_speed'] = np.sqrt(df['u10']**2 + df['v10']**2)
+#         df['wind_dir'] = np.degrees(np.arctan2(df['v10'], df['u10'])) % 360
+#         df['sin_wdir'] = np.sin(np.deg2rad(df['wind_dir']))
+#         df['cos_wdir'] = np.cos(np.deg2rad(df['wind_dir']))
+#
+#         # Convert to Kelvin from Celsius as TFT doesn't accept negative values
+#         df['t2m'] = df['t2m'] + 273.15 
+#
+#         # single site group id
+#         df['group_id'] = 'site0-NCL'
+#         df['group_id'] = df['group_id'].astype('category')
+#
+#         # lag feature
+#         df = df.sort_values(['group_id', 'time_idx'])
+#         df['t2m_lag24'] = df.groupby('group_id')['t2m'].shift(24)
+#         df = df.dropna(subset=['t2m_lag24']).reset_index(drop=True)
+#     except Exception:
+#         logger.exception("Error while processing new categorical features")
+#         raise
+#
+#     print(f'DF processed:\n{df.describe()}')
+#     return df
 
 def create_datasets(
     df: pd.DataFrame, 
@@ -148,24 +189,28 @@ def create_datasets(
     """
     static_categoricals=[]
     static_reals = []
-    time_varying_known_categoricals = ['day_of_week', 'day', 'month', 'hour']
+    time_varying_known_categoricals = ['day_of_week', 'day_of_month', 'month', 'hour']
     time_varying_known_reals=[
         'time_idx', 'TOA', 'Clear sky GHI', 'Clear sky BHI',
             'Clear sky DHI', 'Clear sky BNI', 'sin_doy', 'cos_doy'
     ]
     time_varying_unknown_reals = [
         "t2m_lag24", "u10", "v10", "wind_speed",
-        "sin_wdir", "cos_wdir", "tp", "GHI", "BHI", "DHI", "BNI",
+        "sin_wdir", "cos_wdir", "tp", "BHI", "DHI", "BNI",
     ]
-    cutoff = df['time_idx'].max() - max_prediction_length
+    cutoff = df['time_idx'].max() - (365 * 24)
     training_df = df[df.time_idx <= cutoff]
+    validation_df = df[df.time_idx > cutoff]
+
+
 
     print(df.head())
     try:
         training_dataset = TimeSeriesDataSet(
             training_df,
             time_idx='time_idx',
-            target='t2m',
+            # target='t2m',
+            target='GHI',
             group_ids=['group_id'],
             max_encoder_length=max_encoder_length,
             max_prediction_length=max_prediction_length,
@@ -181,11 +226,12 @@ def create_datasets(
             add_relative_time_idx=True,
             add_target_scales=True,
             add_encoder_length=True,
+            # add_nan=True,  # <-- THE MISSING PIECE
         )
 
         print(training_dataset)
         validation_dataset = TimeSeriesDataSet.from_dataset(
-            training_dataset, training_df, predict=True, stop_randomization=True,
+            training_dataset, validation_df, predict=True, stop_randomization=True,
         )
 
     except Exception:
@@ -288,6 +334,7 @@ def evaluate(
         model = TemporalFusionTransformer.load_from_checkpoint(ckpt_path)
         # actuals = torch.cat([y[0] for x, y in iter(val_loader)].to('cpu'))
         # predictions = model.predict(val_dataloader, trainer_kwargs=dict(accelerator='auto'))
+        print(val_loader)
         raw_prediction = model.predict(val_loader, mode='raw', return_x=True)
         print(raw_prediction.output)
         model.plot_prediction(raw_prediction.x, raw_prediction.output, idx=0)
@@ -327,6 +374,71 @@ def save_predictions(
         logger.info(f"Predictions saved to {output_path}")
     except Exception:
         logger.exception("Failed to save predictions.")
+        raise
+
+def predict_and_plot_specific_date(
+    ckpt_path: TemporalFusionTransformer,
+    full_data: pd.DataFrame,
+    target_date_str: str,
+    max_encoder_length: int
+):
+    """
+    Selects a specific date from the dataset, runs a forecast, 
+    and plots the result against the actual values.
+
+    Args:
+        model: The loaded TFT model from a checkpoint.
+        full_data: The entire 10-year DataFrame after feature processing.
+        target_date_str: The date you want to start the prediction from (e.g., "2022-08-15 00:00:00").
+        max_encoder_length: The historical window size the model needs (24 in your case).
+    """
+    try:
+        model = TemporalFusionTransformer.load_from_checkpoint(ckpt_path)
+        # Find the integer index for our target date
+        target_date = pd.to_datetime(target_date_str)
+        target_idx_query = full_data.query(f"datetime == '{target_date}'")
+        if target_idx_query.empty:
+            logger.error(f"Date {target_date_str} not found in the dataset.")
+            return
+        target_time_idx = target_idx_query.time_idx.iloc[0]
+
+        # Define the slice of data the model needs:
+        # It needs 'max_encoder_length' hours of history BEFORE the prediction starts.
+        start_idx = target_time_idx - max_encoder_length
+        
+        # We also need the future data to plot the "actuals"
+        end_idx = target_time_idx + MAX_PREDICTION_LENGTH
+
+        # Select the data slice
+        prediction_data_slice = full_data[
+            (full_data.time_idx >= start_idx) & (full_data.time_idx < end_idx)
+        ]
+
+        if len(prediction_data_slice) < (max_encoder_length + MAX_PREDICTION_LENGTH):
+            logger.error("Not enough data around the target date to make a full prediction.")
+            return
+
+        # Use the model's built-in functionality to create a dataloader for this specific slice
+        # This is crucial because it applies the correct data normalization.
+        new_raw_predictions = model.predict(
+            prediction_data_slice,
+            mode="raw",
+            return_x=True,
+        )
+
+        # Plot the prediction against the ground truth
+        # The plot_prediction function is perfect for this.
+        print(f"Plotting forecast starting from {target_date_str}")
+        model.plot_prediction(
+            new_raw_predictions.x, 
+            new_raw_predictions.output, 
+            idx=0, 
+            show_future_observed=True # This tells the plot to include the real values
+        )
+        plt.show()
+
+    except Exception:
+        logger.exception("Failed to predict and plot for the specific date.")
         raise
 
 def main():
@@ -387,8 +499,20 @@ def main():
         # irradiance model
         # ckpt = "lightning_logs/tft_run/version_13/checkpoints/tft-epoch=43-val_loss=3.6114.ckpt"
         # temperature model
-        ckpt = "models/irradiance_model.ckpt"
+        # ckpt = "models/irradiance_model.ckpt"
+        ckpt = "lightning_logs/tft_run/version_3/checkpoints/tft-epoch=02-val_loss=4.6475.ckpt"
+        # ckpt = "models/temperature_model.ckpt"
         preds, targets = evaluate(ckpt, val_loader, args.plot_date)
+
+        date_to_predict = "2018-01-01 12:00:00" 
+
+        # Call our new function
+        predict_and_plot_specific_date(
+            ckpt_path=ckpt,
+            full_data=df,  # Use the full, processed DataFrame
+            target_date_str=date_to_predict,
+            max_encoder_length=args.max_encoder_length
+        )
 
         print(preds, "\n", targets)
         # convert to NumPy
