@@ -41,6 +41,9 @@ def parse_args() -> argparse.Namespace:
     """Parses command-line arguments."""
     parser = argparse.ArgumentParser(description="Train and compare TFT forecast strategies")
     parser.add_argument("--csv_path", type=Path, default=CSV_PATH)
+    parser.add_argument("--predicting", type=str, default='GHI')
+    parser.add_argument("--days", type=int, default=168)
+    parser.add_argument("--simulation_hours", type=int, default=168)
     parser.add_argument("--max_encoder_length", type=int, default=MAX_ENCODER_LENGTH)
     parser.add_argument("--max_prediction_length", type=int, default=MAX_PREDICTION_LENGTH)
     parser.add_argument("--batch_size", type=int, default=BATCH_SIZE)
@@ -113,23 +116,25 @@ def create_datasets(
 
     time_varying_known_categoricals = ['day_of_week', 'day_of_month', 'month', 'hour']
     time_varying_known_reals = [
-        'time_idx', 'Clear sky BNI', 'sin_doy', 'cos_doy'
+        'time_idx','sin_doy','cos_doy'
     ]
     time_varying_unknown_reals = [
-        "t2m", # The actual temperature is now an unknown input
-        "t2m_lag24",
+        # "t2m", # The actual temperature is now an unknown input
+        # "t2m_lag24",
         "u10", "v10", "wind_speed", "sin_wdir", "cos_wdir",
         "tp",
         "TOA", # Top-of-Atmosphere is theoretically known, but often grouped with weather
-        "Clear sky GHI", "Clear sky BHI", "Clear sky DHI", "Clear sky BNI",
-        "BHI", "DHI", "BNI" # The other real irradiance components
+        "Clear sky BNI", "Clear sky GHI", "Clear sky BHI", "Clear sky DHI", "Clear sky BNI",
+        "BHI", "DHI", "BNI", # The other real irradiance components
+        "GHI", 
     ]
 
     try:
         training_dataset = TimeSeriesDataSet(
             training_df,
             time_idx='time_idx',
-            target='GHI',
+            # target='GHI',
+            target='t2m',
             group_ids=['group_id'],
             max_encoder_length=max_encoder_length,
             max_prediction_length=max_prediction_length,
@@ -206,7 +211,9 @@ def run_comparison_simulation(
     validation_df: pd.DataFrame,
     max_encoder_length: int,
     max_prediction_length: int,
-    simulation_hours: int = 168
+    predicting: str,
+    days: int,
+    simulation_hours: int,
 ):
     """Simulates and compares Day-Ahead vs. Rolling Horizon forecasting."""
     logger.info("--- Starting Forecast Comparison Simulation ---")
@@ -215,7 +222,7 @@ def run_comparison_simulation(
     results = []
     # start_time_idx = validation_df['time_idx'].min()
     # start_time_idx = validation_df['time_idx'].min()
-    days = 180
+    days = days
     start_time_idx = 87624 + days * 24
 
     for t in range(simulation_hours):
@@ -243,14 +250,24 @@ def run_comparison_simulation(
         rolling_pred = model.predict(rolling_input_df)[0, 0].item()
 
         # --- 3. Get Actual Value ---
-        actual = validation_df.loc[validation_df.time_idx == current_time_idx, 'GHI'].iloc[0]
+        # actual = validation_df.loc[validation_df.time_idx == current_time_idx, 'GHI'].iloc[0]
+        actual = validation_df.loc[validation_df.time_idx == current_time_idx, predicting].iloc[0]
 
-        results.append({
-            'timestamp': current_datetime,
-            'actual': actual,
-            'day_ahead_pred': day_ahead_pred,
-            'rolling_pred': rolling_pred
-        })
+        if predicting == "GHI":
+            results.append({
+                'timestamp': current_datetime,
+                'actual': actual,
+                'day_ahead_pred': day_ahead_pred,
+                'rolling_pred': rolling_pred
+            })
+
+        else:
+            results.append({
+                'timestamp': current_datetime,
+                'actual': actual - 273.15,
+                'day_ahead_pred': day_ahead_pred - 273.15,
+                'rolling_pred': rolling_pred - 273.15
+            })
 
     # --- 4. Analyze and Plot Results ---
     results_df = pd.DataFrame(results).set_index('timestamp')
@@ -274,6 +291,7 @@ def run_comparison_simulation(
     ax.set_title('Forecast Accuracy: Day-Ahead vs. Rolling Horizon', fontsize=16)
     ax.set_ylabel('Global Horizontal Irradiance (GHI)')
     ax.set_xlabel('Date')
+    plt.ylim([0,(np.max(results_df['actual']) * 2)])
     ax.legend(fontsize=12)
     plt.tight_layout()
     plt.savefig("forecast_comparison.png")
@@ -297,11 +315,13 @@ def main():
         logger.info(f"Training complete. Best model saved to: {best_ckpt_path}")
     else:
 
-        # IMPORTANT: Make sure this path points to your best trained model
+
+        # Make sure this path points to your best trained model
         # You can find this path in the output after running with --train
-        # best_ckpt_path = "lightning_logs/tft_irradiance_run/version_3/checkpoints/tft-epoch=36-val_loss=20.7795.ckpt"
-        best_ckpt_path = "models/new_tft_irradiance.ckpt"
-        # best_ckpt_path = "lightning_logs/tft_run/version_3/checkpoints/tft-epoch=02-val_loss=4.6475.ckpt"
+        if args.predicting == "GHI":
+            best_ckpt_path = "models/new_tft_irradiance.ckpt"
+        else:
+            best_ckpt_path = "models/new_tft_temperature.ckpt"
         logger.info(f"Skipping training. Using existing model: {best_ckpt_path}")
 
     try:
@@ -310,7 +330,10 @@ def main():
             full_df=df,
             validation_df=validation_df,
             max_encoder_length=args.max_encoder_length,
-            max_prediction_length=args.max_prediction_length
+            max_prediction_length=args.max_prediction_length,
+            days=args.days,
+            predicting=args.predicting,
+            simulation_hours=args.simulation_hours,
         )
     except FileNotFoundError:
         logger.error(f"Checkpoint file not found at '{best_ckpt_path}'. Please train a model first or correct the path.")
