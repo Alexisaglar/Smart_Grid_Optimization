@@ -207,27 +207,33 @@ def plot_strategy_comparison(results_df: pd.DataFrame, mae_day_ahead: float, mae
     plt.style.use("seaborn-v0_8-ticks")
 
     unit = "(W/m²)" if predicting == "GHI" else "(°C)"
+    title = 'Global Horizontal Irradiance' if predicting == 'GHI' else "Temperature"
     
+    plt.rcParams.update({
+        'font.size': 25,
+        'axes.labelsize': 20,
+        'axes.titlesize': 24,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'legend.fontsize': 18,
+    })
     fig, ax = plt.subplots(figsize=(16, 8))
-    
     plot_hours = 168 # Plot one week
     plot_df = results_df.iloc[:plot_hours]
     
-    ax.plot(plot_df.index, plot_df['actual'], label=f'Actual {predicting}', color='black', linewidth=2.5, zorder=4)
+    ax.plot(plot_df.index, plot_df['actual'], label=f'Actual {title}', color='black', linewidth=2.5, zorder=4)
     ax.plot(plot_df.index, plot_df['day_ahead_pred'], label=f'Day-Ahead (Static) Forecast (MAE: {mae_day_ahead:.2f})', color='#D55E00', linestyle='--', linewidth=2, zorder=3)
     ax.plot(plot_df.index, plot_df['rolling_pred_p50'], label=f'Rolling Horizon (Adaptive) Forecast (MAE: {mae_rolling:.2f})', color='#0072B2', linewidth=2, zorder=5)
     
     ax.fill_between(plot_df.index, plot_df['rolling_pred_p10'], plot_df['rolling_pred_p90'], color='#56B4E9', alpha=0.3, label='Rolling Horizon 10th-90th Percentile')
 
-    ax.set_title(f'Forecasting Strategy Comparison: Static vs. Adaptive ({predicting})', fontsize=16, fontweight='bold')
-    ax.set_ylabel(f'{predicting} {unit}', fontsize=12)
-    ax.set_xlabel('Date', fontsize=12)
-    ax.legend(fontsize=11, loc='upper left')
+    ax.set_title(f'Forecasting Strategy Comparison: Static vs. Adaptive ({title})', fontsize=16, fontweight='bold')
+    ax.set_ylabel(f'{title} {unit}')
+    ax.legend(loc='upper left')
     ax.grid(True, which='both', linestyle='--', alpha=0.6)
-    ax.tick_params(axis='both', which='major', labelsize=11)
     
     fig.tight_layout()
-    fig.savefig(f"strategy_comparison_{predicting}.png", dpi=300)
+    fig.savefig(f"strategy_comparison_{title}.png", dpi=300)
     plt.show()
 
 

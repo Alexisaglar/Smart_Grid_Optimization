@@ -31,7 +31,7 @@ SILICON_PV_PARAMETERS = {
     'epv_t_c': -0.38,  # %/ºC
     'pce_@1sun': 20,
     'pce_@0sun': 18,
-    'peak_power_kW': 5,
+    'peak_power_kW': 50,
 }
 
 EMERGING_PV_PARAMETERS= {
@@ -67,5 +67,5 @@ EMERGING_PV_PARAMETERS= {
     'epv_t_c': -0.38,  # %/ºC
     'pce_@0sun': 21,
     'pce_@1sun': 15,
-    'peak_power_kW': 5,
+    'peak_power_kW': 50,
 }

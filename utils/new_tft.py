@@ -294,6 +294,15 @@ def run_comparison_simulation(
     plt.ylim([0,(np.max(results_df['actual']) * 2)])
     ax.legend(fontsize=12)
     plt.tight_layout()
+    plt.rcParams.update({
+        'font.size': 25,
+        'axes.labelsize': 20,
+        'axes.titlesize': 24,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'legend.fontsize': 18,
+    })
+
     plt.savefig("forecast_comparison.png")
     plt.show()
 
