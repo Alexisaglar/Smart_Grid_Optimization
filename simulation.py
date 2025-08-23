@@ -666,6 +666,97 @@ def plot_integrated_balance(df: pd.DataFrame, title_suffix="", filename="integra
     plt.savefig(filename)
     plt.show()
 
+def plot_single_integrated_bars(df: pd.DataFrame, title_suffix="", filename="final_integrated_bars.png"):
+    """
+    --- FINAL VERSION: Single-Plot Integrated Bar Chart ---
+    Combines all energy dispatch actions into a single plot.
+    - POSITIVE BARS: Show how the actual load is met (PV, Grid, BESS Discharge).
+    - NEGATIVE BARS: Show all other actions (Curtailment, BESS Charge, Grid Export).
+    """
+    # Use the same style and font settings for consistency
+    plt.style.use('seaborn-v0_8-whitegrid')
+    plt.rcParams.update({'font.size': 18, 'axes.labelsize': 18, 'axes.titlesize': 22,
+                         'xtick.labelsize': 14, 'ytick.labelsize': 14, 'legend.fontsize': 12}) # Slightly smaller legend
+
+    hours = df.index
+    bar_width = 0.8
+
+    # --- 1. DEFINE ALL ENERGY COMPONENTS ---
+    # Sources for the load
+    pv_supply = df[[col for col in df.columns if 'pv_' in col]].sum(axis=1)
+    bess_discharge = df[[col for col in df.columns if col.startswith('p_discharge')]].sum(axis=1)
+    grid_import = df['grid_import']
+    # Demand components
+    potential_load = df['load']
+    curtailed_load = df.get('curtailed_load', 0)
+    realized_load = potential_load - curtailed_load
+    # Surplus/Non-Load actions
+    bess_charge = df[[col for col in df.columns if col.startswith('p_charge')]].sum(axis=1)
+    grid_export = df.get('grid_export', 0)
+
+    # --- 2. CALCULATE HOW THE REALIZED LOAD IS MET ---
+    load_met_by_pv = np.minimum(realized_load, pv_supply)
+    remaining_load_after_pv = realized_load - load_met_by_pv
+    load_met_by_bess = np.minimum(remaining_load_after_pv, bess_discharge)
+    remaining_load_after_bess = remaining_load_after_pv - load_met_by_bess
+    load_met_by_grid = remaining_load_after_bess
+
+    # --- 3. SETUP PLOT (Single Axes) ---
+    fig, ax1 = plt.subplots(figsize=(16, 10))
+    ax1.set_title(f'Daily Integrated Energy Dispatch: {title_suffix}')
+    ax1.set_xlabel('Time (t)')
+    ax1.set_ylabel('Power (kW)')
+
+    # --- 4. PLOT POSITIVE BARS: DEMAND FULFILLMENT ---
+    ax1.bar(hours, load_met_by_pv * 1000, width=bar_width,
+            label=r'$P_{PV} \to P_{D}$', color='#FD841F')
+    ax1.bar(hours, load_met_by_grid * 1000, width=bar_width, bottom=load_met_by_pv * 1000,
+            label=r'$P_{G2H}$', color='#40679E')
+    ax1.bar(hours, load_met_by_bess * 1000, width=bar_width, bottom=(load_met_by_pv + load_met_by_grid) * 1000,
+            label=r'$P_{BS-} \to P_{D}$', color='#527853')
+
+    # --- 5. PLOT NEGATIVE BARS: ALL OTHER ACTIONS (STACKED) ---
+    # First negative layer: Curtailment
+    ax1.bar(hours, -curtailed_load * 1000, width=bar_width,
+            label=r'$P_{Curt}$', color='#FF6347') # Coral/Reddish-pink
+    
+    # Second negative layer: Battery Charging (stacked below curtailment)
+    bottom_for_charge = -curtailed_load * 1000
+    ax1.bar(hours, -bess_charge * 1000, width=bar_width, bottom=bottom_for_charge,
+            label=r'$P_{BS+}$ (Charge)', color='#90EE90') # Light Green
+
+    # Third negative layer: Grid Export (stacked below charge)
+    bottom_for_export = bottom_for_charge - (bess_charge * 1000)
+    ax1.bar(hours, -grid_export * 1000, width=bar_width, bottom=bottom_for_export,
+            label=r'$P_{H2G}$ (Export)', color='#A9A9A9') # Dark Gray
+
+    # --- 6. OVERLAY LINE PLOTS ---
+    ax1.plot(hours, potential_load * 1000, color='red', linestyle='--', linewidth=2.0, label=r'$P_{D, pot}$')
+    ax1.plot(hours, realized_load * 1000, color='black', linewidth=2.5, label=r'$P_{D}$')
+
+    # --- 7. ADD PRICE ON SECONDARY AXIS ---
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Price (/MWh)')
+    ax2.plot(hours, df['grid_price'], color='darkorange', linestyle=':', marker='o',
+             markersize=4, label='Price')
+    ax2.set_ylim(0, 200)
+
+    # --- 8. FINAL FORMATTING ---
+    ax1.grid(True, axis='y', linestyle='--', alpha=0.7)
+    ax1.axhline(0, color='black', linewidth=1.5)
+    ax1.set_xlim(-0.5, 23.5)
+
+    # Combine legends from both axes
+    lines, labels = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines + lines2, labels + labels2, loc='upper left', ncol=3, frameon=True)
+
+    plt.xticks(np.arange(0, 24, 2))
+    fig.tight_layout()
+    plt.savefig(filename)
+    plt.show()
+
+
 if __name__ == "__main__":
     network = nw.case33bw()
 
@@ -693,7 +784,7 @@ if __name__ == "__main__":
             
     # --- End of New Load Calculation ---
     # total_load_forecast = network.load.p_mw.sum() * (np.sin(np.linspace(0, 2*np.pi, 24)) * 0.4 + 0.8)
-    grid_price_data = np.array([50, 45, 40, 40, 45, 60, 80, 120, 110, 90, 70, 60, 55, 50, 55, 75, 130, 150, 120, 90, 80, 70, 60, 50])
+    grid_price_data = np.array([50, 45, 40, 40, 45, 60, 80, 120, 110, 90, 70, 60, 55, 50, 55, 75, 130, 150, 120, 90, 80, 70, 60, 50]) * 1.5
 
     try:
         t2m_df = pd.read_csv("december_t2m.csv", parse_dates=['timestamp']).head(24)
@@ -704,10 +795,10 @@ if __name__ == "__main__":
 
     forecast_models = {
         'Actual': 'actual',
-        # 'TFT': 'day_ahead_pred',
+        'TFT': 'day_ahead_pred',
         'TFT Rolling Horizon': 'rolling_pred_p50',
-        # 'LSTM': 'lstm_pred',
-        # 'Naive': 'naive_pred'
+        'LSTM': 'lstm_pred',
+        'Naive': 'naive_pred'
     }
 
     scenarios = {
@@ -759,7 +850,7 @@ if __name__ == "__main__":
         print(gen_plot_df)
 
         print("\n" + "="*70)
-        print("FINAL KPI COMPARISON ACROSS ALL SCENARIOS AND MODELS (WINTER)")
+        print("FINAL KPI COMPARISON ACROSS ALL SCENARIOS AND MODELS (SUMMER)")
         print("="*70)
         print(kpi_results_df[['Scenario', 'Forecast Model', 'total_cost', 'self_sufficiency_rate_pct']].round(2))
         print("="*70 + "\n")
@@ -770,20 +861,41 @@ if __name__ == "__main__":
 
         # Plot the energy dispatch for best and worst cases
         advanced_kpis = kpi_results_df[kpi_results_df['Scenario'] == 'Advanced (Emerging PV)']
-        if not advanced_kpis.empty:
-            # third
-            best_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmin()]
-            worst_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmax()]
-            
-            print(f"--- Generating dispatch plot for BEST case: {best_case['Forecast Model']} forecast ---")
-            best_df = schedule_storage[('Advanced (Emerging PV)', best_case['Forecast Model'])]
-            # --- Call the NEW integrated function here ---
-            plot_integrated_balance(best_df, f"Best Case ({best_case['Forecast Model']} Forecast)", "integrated_best.png")
 
-            print(f"--- Generating dispatch plot for WORST case: {worst_case['Forecast Model']} forecast ---")
-            worst_df = schedule_storage[('Advanced (Emerging PV)', worst_case['Forecast Model'])]
-            # --- And call the NEW integrated function here ---
-            plot_integrated_balance(worst_df, f"Worst Case ({worst_case['Forecast Model']} Forecast)", "integrated_worst.png")
+
+    if not advanced_kpis.empty:
+          # Get the 'TFT Rolling Horizon' schedule, as requested
+          model_name_to_plot = 'TFT Rolling Horizon'
+          
+          # Check if this schedule exists in your stored results
+          if ('Advanced (Emerging PV)', model_name_to_plot) in schedule_storage:
+              print(f"--- Generating DASHBOARD BAR PLOT for: {model_name_to_plot} ---")
+              
+              # Retrieve the corresponding DataFrame
+              best_df = schedule_storage[('Advanced (Emerging PV)', model_name_to_plot)]
+              
+              # --- CALL THE NEW DASHBOARD FUNCTION HERE ---
+              plot_single_integrated_bars(
+                  best_df, 
+                  f"Best Case ({model_name_to_plot} Forecast)", 
+                  "dashboard_bars_best_case.png"
+              )
+          else:
+              print(f"Could not find schedule for '{model_name_to_plot}'. Plotting skipped.")            
+
+             # third
+            # best_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmin()]
+            # worst_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmax()]
+            #
+            # print(f"--- Generating dispatch plot for BEST case: {best_case['Forecast Model']} forecast ---")
+            # best_df = schedule_storage[('Advanced (Emerging PV)', best_case['Forecast Model'])]
+            # # --- Call the NEW integrated function here ---
+            # plot_integrated_balance(best_df, f"Best Case ({best_case['Forecast Model']} Forecast)", "integrated_best.png")
+            #
+            # print(f"--- Generating dispatch plot for WORST case: {worst_case['Forecast Model']} forecast ---")
+            # worst_df = schedule_storage[('Advanced (Emerging PV)', worst_case['Forecast Model'])]
+            # # --- And call the NEW integrated function here ---
+            # plot_integrated_balance(worst_df, f"Worst Case ({worst_case['Forecast Model']} Forecast)", "integrated_worst.png")
 
             # second
             # best_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmin()]
