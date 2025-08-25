@@ -25,13 +25,13 @@ class PvSystem:
         self.name = name
         self.bus_idx = bus_idx
         self.forecast = None # Forecast will be set later
-
-        # CRITICAL FIX: Convert percentage-based parameters to fractions for calculations
-        self.parameters['sd_t_c'] /= 100.0
-        self.parameters['epv_t_c'] /= 100.0
-        self.parameters['pce_@1sun'] /= 100.0
-        self.parameters['pce_@0sun'] /= 100.0
-
+        
+        # # CRITICAL FIX: Convert percentage-based parameters to fractions for calculations
+        # self.parameters['sd_t_c'] /= 100.0
+        # self.parameters['epv_t_c'] /= 100.0
+        # self.parameters['pce_@1sun'] /= 100.0
+        # self.parameters['pce_@0sun'] /= 100.0
+        #
     def _beta(self, temperature) -> pd.DataFrame:
         return (self.parameters['sd_t_c'] - self.parameters['epv_t_c']) * temperature
 
@@ -731,8 +731,8 @@ def plot_single_integrated_bars(df: pd.DataFrame, title_suffix="", filename="fin
             label=r'$P_{H2G}$ (Export)', color='#A9A9A9') # Dark Gray
 
     # --- 6. OVERLAY LINE PLOTS ---
-    ax1.plot(hours, potential_load * 1000, color='red', linestyle='--', linewidth=2.0, label=r'$P_{D, pot}$')
-    ax1.plot(hours, realized_load * 1000, color='black', linewidth=2.5, label=r'$P_{D}$')
+    ax1.plot(hours, potential_load * 1000, color='red', linestyle='--', linewidth=2.0, label=r'$P^{D, pot}$')
+    ax1.plot(hours, realized_load * 1000, color='black', linewidth=2.5, label=r'$P^{D}$')
 
     # --- 7. ADD PRICE ON SECONDARY AXIS ---
     ax2 = ax1.twinx()
@@ -756,6 +756,130 @@ def plot_single_integrated_bars(df: pd.DataFrame, title_suffix="", filename="fin
     plt.savefig(filename)
     plt.show()
 
+
+def plot_thesis_dispatch_bars(df: pd.DataFrame, title_suffix="", filename="dispatch_final.png"):
+    """
+    Generates a thesis-quality, integrated bar chart for energy dispatch.
+
+    This function addresses all specific formatting requests:
+    - Uses stacked bar charts for clarity.
+    - Corrects labels to standard LaTeX format with superscripts.
+    - Displays power in MW.
+    - Sets all axes to start at zero and dynamically adjusts limits to fit all data.
+    - Increases font sizes for readability.
+    - Adds black edges to bars and ensures gridlines are in the background.
+    - Enhances visibility of the price curve.
+    """
+    # 1. --- Global Style and Font Configuration ---
+    plt.style.use('seaborn-v0_8-whitegrid')
+    plt.rcParams.update({
+        'font.size': 25,
+        'axes.labelsize': 20,
+        'axes.titlesize': 22,
+        'xtick.labelsize': 25,
+        'ytick.labelsize': 25,
+        'legend.fontsize': 20,
+        'figure.titlesize': 24
+    })
+
+    hours = df.index
+    bar_width = 0.85
+
+    # 2. --- Data Preparation (Units are already in MW) ---
+    # Sources
+    pv_supply = df[[col for col in df.columns if 'pv_' in col]].sum(axis=1)
+    bess_discharge = df[[col for col in df.columns if col.startswith('p_discharge')]].sum(axis=1)
+    grid_import = df['grid_import']
+    # Demands / Sinks
+    potential_load = df['load']
+    curtailed_load = df.get('curtailed_load', 0)
+    realized_load = potential_load - curtailed_load
+    bess_charge = df[[col for col in df.columns if col.startswith('p_charge')]].sum(axis=1)
+    grid_export = df.get('grid_export', 0)
+
+    # Calculate stacking components for demand fulfillment
+    load_met_by_pv = np.minimum(realized_load, pv_supply)
+    remaining_load_after_pv = realized_load - load_met_by_pv
+    load_met_by_bess = np.minimum(remaining_load_after_pv, bess_discharge)
+    remaining_load_after_bess = remaining_load_after_pv - load_met_by_bess
+    load_met_by_grid = remaining_load_after_bess
+
+    # 3. --- Plot Setup ---
+    fig, ax1 = plt.subplots(figsize=(18, 10))
+    # fig.suptitle(f'Daily Energy Dispatch: {title_suffix}', y=0.96)
+    ax1.set_ylabel('Power (MW)')
+    ax1.set_xlabel('Time (Hour)')
+    
+    # Ensure grid is drawn behind plot elements
+    ax1.set_axisbelow(True)
+
+    # 4. --- Plot Positive Bars (Demand Fulfillment) ---
+    # Stack order: PV -> Grid -> BESS
+    ax1.bar(hours, load_met_by_pv, width=bar_width,
+            label=r'$P^{PV} \to P^{D}$', color='#FD841F', edgecolor='black', linewidth=0.8)
+    
+    ax1.bar(hours, load_met_by_grid, width=bar_width, bottom=load_met_by_pv,
+            label=r'$P^{g}$', color='#40679E', edgecolor='black', linewidth=0.8)
+            
+    ax1.bar(hours, load_met_by_bess, width=bar_width, bottom=load_met_by_pv + load_met_by_grid,
+            label=r'$P^{BS-}$', color='#527853', edgecolor='black', linewidth=0.8)
+
+    # 5. --- Plot Negative Bars (Surplus/Curtailment Actions) ---
+    # Stack order: Curtailment -> BESS Charge -> Grid Export
+    ax1.bar(hours, -curtailed_load, width=bar_width,
+            label=r'$P^{x}$', color='#FF6347', edgecolor='black', linewidth=0.8)
+    
+    ax1.bar(hours, -bess_charge, width=bar_width, bottom=-curtailed_load,
+            label=r'$P^{BS+}$', color='#90EE90', edgecolor='black', linewidth=0.8)
+    
+    # ax1.bar(hours, -grid_export, width=bar_width, bottom=-(curtailed_load + bess_charge),
+    #         label=r'$P_{\mathrm{H2G}}$', color='#A9A9A9', edgecolor='black', linewidth=0.8)
+
+    # 6. --- Overlay Line Plots for Demand ---
+    # zorder ensures lines are plotted on top of the bars
+    ax1.plot(hours, potential_load, color='darkred', linestyle='--', linewidth=2.5, label=r'$P_{\mathrm{D}}^{\mathrm{pot}}$', zorder=3)
+    ax1.plot(hours, realized_load, color='black', linestyle='-', linewidth=3, label=r'$P_{\mathrm{D}}$', zorder=3)
+    
+    # 7. --- Secondary Y-Axis for Price ---
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Price (£/MWh)')
+    price_color = 'darkorange'
+    ax2.plot(hours, df['grid_price'], color=price_color, linestyle=':', linewidth=3,
+             marker='o', markersize=6, label='Price', zorder=3)
+    
+    # --- EDIT START: COLOR-MATCH RIGHT AXIS AND REMOVE ITS GRID ---
+    # The grid is already tied only to ax1, but this makes the distinction clear.
+    # Color the tick labels, the ticks themselves, and the axis label to match the price line.
+    ax2.yaxis.label.set_color(price_color)
+    ax2.tick_params(axis='y', colors=price_color)
+    ax2.grid(False) # Explicitly disable grid for the secondary axis
+    # --- EDIT END ---
+
+    # 8. --- Final Formatting ---
+    ax1.axhline(0, color='black', linewidth=1.5)
+    ax1.set_xlim(-0.5, 23.5)
+    
+    # Dynamic Y-axis Limits
+    positive_max = (load_met_by_pv + load_met_by_grid + load_met_by_bess).max()
+    demand_max = potential_load.max()
+    upper_power_limit = max(positive_max, demand_max) * 1.15
+    negative_max = (curtailed_load + bess_charge + grid_export).max()
+    lower_power_limit = -negative_max * 1.15
+    ax1.set_ylim(lower_power_limit, upper_power_limit)
+    
+    price_max = df['grid_price'].max()
+    ax2.set_ylim(0, price_max * 1.15)
+
+    # Combine legends from both axes
+    lines, labels = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines + lines2, labels + labels2, loc='upper left', ncol=3, frameon=True, facecolor='white', framealpha=0.8)
+    
+    plt.xticks(np.arange(0, 24, 2))
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    plt.show()
 
 if __name__ == "__main__":
     network = nw.case33bw()
@@ -784,11 +908,11 @@ if __name__ == "__main__":
             
     # --- End of New Load Calculation ---
     # total_load_forecast = network.load.p_mw.sum() * (np.sin(np.linspace(0, 2*np.pi, 24)) * 0.4 + 0.8)
-    grid_price_data = np.array([50, 45, 40, 40, 45, 60, 80, 120, 110, 90, 70, 60, 55, 50, 55, 75, 130, 150, 120, 90, 80, 70, 60, 50]) * 1.5
+    grid_price_data = np.array([50, 45, 40, 40, 45, 60, 80, 120, 110, 90, 70, 60, 55, 50, 55, 75, 130, 150, 120, 90, 80, 70, 60, 50])
 
     try:
-        t2m_df = pd.read_csv("december_t2m.csv", parse_dates=['timestamp']).head(24)
-        ghi_df = pd.read_csv("december_GHI.csv", parse_dates=['timestamp']).head(24)
+        t2m_df = pd.read_csv("june_t2m.csv", parse_dates=['timestamp']).head(24)
+        ghi_df = pd.read_csv("june_GHI.csv", parse_dates=['timestamp']).head(24)
     except FileNotFoundError:
         print("Error: Ensure 'december_t2m.csv' and 'december_GHI.csv' are in the same directory.")
         exit()
@@ -861,6 +985,27 @@ if __name__ == "__main__":
 
         # Plot the energy dispatch for best and worst cases
         advanced_kpis = kpi_results_df[kpi_results_df['Scenario'] == 'Advanced (Emerging PV)']
+        
+        # Plot the dispatch for the 'Advanced' scenario with the 'TFT Rolling Horizon' forecast
+        scenario_to_plot = 'Advanced (Emerging PV)'
+        model_to_plot = 'TFT Rolling Horizon'
+        
+        if (scenario_to_plot, model_to_plot) in schedule_storage:
+            print(f"--- Generating final thesis plot for: {scenario_to_plot} with {model_to_plot} forecast ---")
+            dispatch_df = schedule_storage[(scenario_to_plot, model_to_plot)]
+            
+            # --- CALL THE NEW, IMPROVED PLOTTING FUNCTION ---
+            plot_thesis_dispatch_bars(
+                dispatch_df, 
+                title_suffix=f"{scenario_to_plot} ({model_to_plot})", 
+                filename="dispatch_thesis_final.png"
+            )
+        else:
+            print(f"Could not find the specified scenario '{scenario_to_plot}' with model '{model_to_plot}' to plot.")
+
+    else:
+        print("\n--- All scenarios failed to solve. No results to analyze. ---")
+
 
 
     if not advanced_kpis.empty:
@@ -910,7 +1055,7 @@ if __name__ == "__main__":
             # worst_df = schedule_storage[('Advanced (Emerging PV)', worst_case['Forecast Model'])]
             # # --- And call the NEW function here ---
             # plot_demand_fulfillment(worst_df, f"Worst Case ({worst_case['Forecast Model']} Forecast)", "demand_fulfillment_worst.png")
-
+#
             # main
             # best_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmin()]
             # worst_case = advanced_kpis.loc[advanced_kpis['total_cost'].idxmax()]
