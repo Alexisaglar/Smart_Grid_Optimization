@@ -125,13 +125,17 @@ def create_tft_datasets(
     
     training_dataset = TimeSeriesDataSet(
         training_df, time_idx='time_idx', target=predicting, group_ids=['group_id'],
-        max_encoder_length=max_encoder_length, max_prediction_length=MAX_PREDICTION_LENGTH,
-        static_categoricals=[], static_reals=[],
+        max_encoder_length=max_encoder_length, 
+        max_prediction_length=MAX_PREDICTION_LENGTH,
+        static_categoricals=[],
+        static_reals=[],
         time_varying_known_categoricals=time_varying_known_categoricals,
         time_varying_known_reals=time_varying_known_reals,
         time_varying_unknown_reals=time_varying_unknown_reals,
         target_normalizer=GroupNormalizer(groups=["group_id"], transformation="softplus"),
-        add_relative_time_idx=True, add_target_scales=True, add_encoder_length=True,
+        add_relative_time_idx=True, 
+        add_target_scales=True, 
+        add_encoder_length=True,
     )
     return training_dataset, validation_df
 
@@ -260,6 +264,7 @@ def train_lstm_model(df, predicting, max_encoder_length, args):
 # ---------------- Evaluation Functions ----------------
 
 ## --- FUNCTION 1: For Windowed Analysis & Plotting ---
+## --- FUNCTION 1: For Windowed Analysis & Plotting (REVISED) ---
 def run_evaluation(
     tft_model, lstm_model, lstm_x_scaler, lstm_y_scaler, lstm_features_x,
     full_df, validation_df, max_encoder_length, predicting,
@@ -269,22 +274,57 @@ def run_evaluation(
     logger.info(f"--- Starting WINDOW Evaluation for {predicting} ---")
     logger.info(f"Window: {simulation_hours} hours, starting {days} days into the validation set.")
     
-    results = []
+    # --- NEW: Define the full simulation window ---
     start_time_idx = validation_df['time_idx'].min() + (days * 24)
+    end_time_idx = start_time_idx + simulation_hours - 1
     
-    for t in tqdm(range(simulation_hours), desc="Simulating hours for window plot"):
+    # --- NEW: Create a single DataFrame for the entire window we need to predict ---
+    # We include a buffer for the encoder and future known inputs.
+    window_df = full_df[
+        full_df.time_idx.between(start_time_idx - max_encoder_length, end_time_idx + MAX_PREDICTION_LENGTH)
+    ].copy()
+
+    # --- NEW: Perform one robust, batch prediction for the ROLLING forecast ---
+    logger.info("Performing batch prediction for the TFT rolling forecast...")
+    rolling_preds_raw = tft_model.predict(
+        window_df,
+        mode="quantiles",
+        return_index=True
+    )
+    # The model predicts for every possible start time. We store the results in a new DataFrame.
+    rolling_preds_df = pd.DataFrame({
+        'rolling_pred_p10': rolling_preds_raw.prediction[:, 0, 0], # 10th quantile
+        'rolling_pred_p50': rolling_preds_raw.prediction[:, 0, 3], # 50th quantile
+        'rolling_pred_p90': rolling_preds_raw.prediction[:, 0, 6], # 90th quantile
+    }, index=rolling_preds_raw.index.time_idx)
+
+    # --- NEW: Pre-calculate all DAY-AHEAD forecasts as well ---
+    logger.info("Performing batch predictions for the TFT day-ahead forecast...")
+    day_ahead_predictions = {}
+    # Loop every 24 hours to generate a new day-ahead forecast
+    for t_start in range(0, simulation_hours, 24):
+        current_time_idx = start_time_idx + t_start
+        day_ahead_input_df = full_df[full_df.time_idx.between(current_time_idx - max_encoder_length, current_time_idx + MAX_PREDICTION_LENGTH - 1)]
+        forecast = tft_model.predict(day_ahead_input_df, mode="quantiles", return_x=False)
+        # Store the full 24-hour forecast in a dictionary for easy lookup
+        for i in range(24):
+            if (t_start + i) < simulation_hours:
+                day_ahead_predictions[current_time_idx + i] = forecast[0, i, 3].item() # P50 prediction
+
+    results = []
+    # --- REVISED: The main loop is now a fast and simple assembly loop ---
+    # No model prediction happens inside this loop anymore.
+    for t in tqdm(range(simulation_hours), desc="Assembling results"):
         current_time_idx = start_time_idx + t
         current_datetime = full_df.loc[full_df.time_idx == current_time_idx, 'datetime'].iloc[0]
         
-        if t % 24 == 0:
-            day_ahead_input_df = full_df[full_df.time_idx.between(current_time_idx - max_encoder_length, current_time_idx + MAX_PREDICTION_LENGTH - 1)]
-            day_ahead_full_forecast = tft_model.predict(day_ahead_input_df, mode="quantiles", return_x=False)
-        day_ahead_pred = day_ahead_full_forecast[0, t % 24, 3].item()
+        # --- REVISED: Look up all pre-calculated TFT predictions ---
+        day_ahead_pred = day_ahead_predictions.get(current_time_idx)
+        rolling_p10 = rolling_preds_df.loc[current_time_idx, 'rolling_pred_p10']
+        rolling_p50 = rolling_preds_df.loc[current_time_idx, 'rolling_pred_p50']
+        rolling_p90 = rolling_preds_df.loc[current_time_idx, 'rolling_pred_p90']
 
-        rolling_input_df = full_df[full_df.time_idx.between(current_time_idx - max_encoder_length, current_time_idx + MAX_PREDICTION_LENGTH -1)]
-        rolling_full_forecast = tft_model.predict(rolling_input_df, mode="quantiles", return_x=False)
-        rolling_p10, rolling_p50, rolling_p90 = [rolling_full_forecast[0, 0, i].item() for i in [0, 3, 6]]
-
+        # --- LSTM and Naive predictions (original logic is fine) ---
         encoder_start = current_time_idx - max_encoder_length
         encoder_end = current_time_idx - 1
         lstm_input_df_x = full_df.loc[full_df.time_idx.between(encoder_start, encoder_end), lstm_features_x]
@@ -334,7 +374,7 @@ def run_evaluation(
 
     return results_df, {name: metrics['MAE'] for name, metrics in final_metrics.items()}
 
-## --- FUNCTION 2: For Efficient Full-Year Analysis ---
+
 ## --- FUNCTION 2: For Efficient Full-Year Analysis ---
 def evaluate_full_year(
     tft_model, lstm_model, lstm_x_scaler, lstm_y_scaler, lstm_features_x,
@@ -497,12 +537,22 @@ def main():
         logger.info("MODE: Running window analysis and plotting.")
         tft_training_dataset, validation_df = create_tft_datasets(df, args.max_encoder_length, args.predicting)
         
-        try:
-            tft_ckpt = f"models/new_tft_{'irradiance' if args.predicting == 'GHI' else 'temperature'}.ckpt"
+        # --- REVISED LOGIC TO TRAIN IF MODEL IS MISSING ---
+        Path("models").mkdir(exist_ok=True)
+        tft_ckpt = f"models/new_tft_{'irradiance' if args.predicting == 'GHI' else 'temperature'}.ckpt"
+
+        if args.train_tft or not Path(tft_ckpt).exists():
+            if args.train_tft:
+                logger.info("--- Training new TFT model as requested by --train_tft flag... ---")
+            else:
+                logger.info(f"--- TFT model not found at {tft_ckpt}. Training new model... ---")
+            
+            best_model_path = train_tft_model(tft_training_dataset, validation_df, args)
+            tft_model = TemporalFusionTransformer.load_from_checkpoint(best_model_path)
+        else:
+            logger.info(f"--- Loading existing TFT model from {tft_ckpt} ---")
             tft_model = TemporalFusionTransformer.load_from_checkpoint(tft_ckpt)
-        except FileNotFoundError:
-            logger.error(f"TFT model not found for {args.predicting}. Please train it first.")
-            sys.exit(1)
+        # --- END OF REVISED LOGIC ---
             
         try:
             lstm_model_path = f"models/lstm_{args.predicting}.pt"
