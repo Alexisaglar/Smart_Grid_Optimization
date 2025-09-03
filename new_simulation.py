@@ -1018,7 +1018,7 @@ def plot_dr_stacked_bar(schedule_df, dr_participants, net, total_load_forecast, 
     """
     # MODIFIED: Increased base font size for better readability
     plt.style.use('seaborn-v0_8-whitegrid')
-    plt.rcParams.update({'font.size': 30})
+    plt.rcParams.update({'font.size': 25})
 
     hours = schedule_df.index
     base_loads_p = net.load.set_index('bus')['p_mw']
@@ -1082,7 +1082,7 @@ def plot_dr_stacked_bar(schedule_df, dr_participants, net, total_load_forecast, 
 
     # MODIFIED: Set the annotation text to the new right-hand axis
     ax2.set_ylabel('Actual Load Demand', fontsize=26)
-    ax2.yaxis.set_label_coords(1.01, 0.75) # Position the label
+    ax2.yaxis.set_label_coords(1.01, 0.65) # Position the label
     
     # MODIFIED: We will create the second label with a text box instead
     ax.text(1.03, 0.25, 'Load Curtailed', transform=ax.transAxes, 
@@ -1090,7 +1090,7 @@ def plot_dr_stacked_bar(schedule_df, dr_participants, net, total_load_forecast, 
 
     # MODIFIED: Improved legend formatting
     ax.legend(title='Participant',
-              bbox_to_anchor=(1.03, 1), # Position legend outside the plot
+              bbox_to_anchor=(1.04, 1), # Position legend outside the plot
               loc='upper left',
               borderaxespad=0.)
 
