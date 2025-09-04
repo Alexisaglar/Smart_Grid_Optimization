@@ -342,7 +342,7 @@ def plot_results(results_df, maes, predicting, simulation_hours):
     fig, ax = plt.subplots(figsize=(16, 8))
     
     plot_df = results_df.head(simulation_hours)
-    plot_df.to_csv('june_GHI.csv')
+    plot_df.to_csv('4_days_december_t2m.csv')
     
     ax.fill_between(plot_df.index, plot_df['rolling_pred_p10'], plot_df['rolling_pred_p90'], color='#56B4E9', alpha=0.3, label='TFT Rolling 10th-90th Percentile')
     ax.plot(plot_df.index, plot_df['rolling_pred_p50'], label=f'TFT Rolling', color='#0072B2', linewidth=2, zorder=6)
