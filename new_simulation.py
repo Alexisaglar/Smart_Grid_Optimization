@@ -955,6 +955,14 @@ def plot_thesis_dispatch_bars(df: pd.DataFrame, title_suffix="", filename="dispa
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines + lines2, labels + labels2, loc='upper left', ncol=3, frameon=True, facecolor='white', framealpha=0.8)
     
+    for spine in ax2.spines.values():
+        spine.set_edgecolor('black')
+        spine.set_linewidth(1.5)
+
+    for spine in ax1.spines.values():
+        spine.set_edgecolor('black')
+        spine.set_linewidth(1.5)
+
     plt.xticks(np.arange(0, 24, 2))
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     
@@ -1042,11 +1050,6 @@ def plot_dr_stacked_bar(schedule_df, dr_participants, net, total_load_forecast, 
     # --- 2. Setup the Plot ---
     fig, ax = plt.subplots(figsize=(14, 10)) # MODIFIED: Increased figure height slightly
     bar_width = 0.7
-
-    for spine in ax.spines.values():
-        spine.set_edgecolor('black')
-        spine.set_linewidth(1.5)
-
     colors = plt.cm.get_cmap('cividis', len(dr_participants))
 
     # --- 3. Plot Stacked Bars ---
@@ -1074,11 +1077,11 @@ def plot_dr_stacked_bar(schedule_df, dr_participants, net, total_load_forecast, 
     ax2.set_yticks([]) # Hide the ticks on the right axis
     
     # MODIFIED: Remove the y-axis spine (the line) on the right for a cleaner look
-    ax2.spines['right'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
-    ax2.spines['top'].set_visible(False)
-    ax2.spines['bottom'].set_visible(False)
-
+    # ax2.spines['right'].set_visible(True)
+    # ax2.spines['left'].set_visible(True)
+    # ax2.spines['top'].set_visible(True)
+    # ax2.spines['bottom'].set_visible(True)
+    #
 
     # MODIFIED: Set the annotation text to the new right-hand axis
     ax2.set_ylabel('Actual Load Demand', fontsize=26)
@@ -1093,6 +1096,11 @@ def plot_dr_stacked_bar(schedule_df, dr_participants, net, total_load_forecast, 
               bbox_to_anchor=(1.04, 1), # Position legend outside the plot
               loc='upper left',
               borderaxespad=0.)
+
+    for spine in ax.spines.values():
+        spine.set_edgecolor('black')
+        spine.set_linewidth(1.5)
+
 
     ax.set_xticks(np.arange(0, 25, 2))
     ax.set_xlim(-0.5, 23.5)
@@ -1156,8 +1164,8 @@ if __name__ == "__main__":
     grid_price_data = np.array([50, 45, 40, 40, 45, 60, 80, 120, 110, 90, 70, 60, 55, 50, 55, 75, 130, 150, 120, 90, 80, 70, 60, 50])
 
     try:
-        t2m_df = pd.read_csv("june_t2m.csv", parse_dates=['timestamp']).head(24)
-        ghi_df = pd.read_csv("june_GHI.csv", parse_dates=['timestamp']).head(24)
+        t2m_df = pd.read_csv("single_day_forecast_july_t2m.csv", parse_dates=['timestamp']).head(24)
+        ghi_df = pd.read_csv("single_day_forecast_july_ghi.csv", parse_dates=['timestamp']).head(24)
     except FileNotFoundError:
         print("Error: Ensure 'december_t2m.csv' and 'december_GHI.csv' are in the same directory.")
         exit()
